@@ -1,5 +1,5 @@
 import { Configuration } from "webpack";
-import { BuildOptions } from "./types";
+import { BuildOptions } from "./wbTypes";
 
 export function resolvers(options: BuildOptions): Configuration["resolve"] {
   return {

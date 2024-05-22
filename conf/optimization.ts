@@ -1,6 +1,6 @@
 import { Configuration } from "webpack";
 import { EsbuildPlugin } from "esbuild-loader";
-import { BuildOptions } from "./types";
+import { BuildOptions } from "./wbTypes";
 
 export function optimization({
   mode,

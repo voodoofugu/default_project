@@ -1,5 +1,5 @@
 import { ModuleOptions } from "webpack";
-import { BuildOptions } from "./types";
+import { BuildOptions } from "./wbTypes";
 
 export function loaders(options: BuildOptions): ModuleOptions["rules"] {
   const isDev = options.mode === "development";

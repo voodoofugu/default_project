@@ -1,4 +1,4 @@
-export interface BuildPaths {
+interface BuildPaths {
   entry: string;
   html: string;
   public: string;
@@ -6,8 +6,8 @@ export interface BuildPaths {
   src: string;
 }
 
-export type BuildMode = "production" | "development";
-export type BuildPlatform = "mobile" | "desktop";
+type BuildMode = "production" | "development";
+type BuildPlatform = "mobile" | "desktop";
 
 export interface BuildOptions {
   port: number;
@@ -15,3 +15,5 @@ export interface BuildOptions {
   mode: BuildMode;
   platform: BuildPlatform;
 }
+
+export const port: number = 3333;

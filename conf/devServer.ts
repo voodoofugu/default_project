@@ -1,5 +1,5 @@
 import type { Configuration as DevServerConfiguration } from "webpack-dev-server";
-import { BuildOptions } from "./types";
+import { BuildOptions } from "./wbTypes";
 import path from "path";
 
 export function devServer(options: BuildOptions): DevServerConfiguration {
@@ -19,10 +19,6 @@ export function devServer(options: BuildOptions): DevServerConfiguration {
       {
         directory: path.join("src/img"),
         publicPath: "/img/",
-      },
-      {
-        directory: path.join("src/style"),
-        publicPath: "/style/",
       },
     ],
   };

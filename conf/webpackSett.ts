@@ -4,7 +4,7 @@ import { loaders } from "./loaders";
 import { optimization } from "./optimization";
 import { plugins } from "./plugins";
 import { resolvers } from "./resolvers";
-import { BuildOptions } from "./types";
+import { BuildOptions } from "./wbTypes";
 
 export function webpackSett(options: BuildOptions): webpack.Configuration {
   const { mode, paths } = options;
@@ -24,7 +24,7 @@ export function webpackSett(options: BuildOptions): webpack.Configuration {
       rules: loaders(options),
     },
     resolve: resolvers(options),
-    devtool: isDev ? "eval-cheap-module-source-map" : false, //false or "source-map"
+    devtool: isDev ? "eval-cheap-module-source-map" : false,
     devServer: isDev ? devServer(options) : undefined,
   };
 }

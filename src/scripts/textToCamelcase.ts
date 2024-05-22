@@ -1,4 +1,4 @@
-export default function textToCamelcase(text: string) {
+export default function textToCamelcase(text: string): string {
   let transformed = text.replace(/^\d+/, "");
   transformed = transformed.replace(/[-_]\w/g, (match) =>
     match.charAt(1).toUpperCase()

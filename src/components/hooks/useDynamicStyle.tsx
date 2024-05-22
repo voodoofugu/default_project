@@ -9,7 +9,7 @@ const clearStyles = (fileNames: string[]) => {
     if (!fileNames.includes(id)) {
       const styleElement = document.getElementById(id);
       if (styleElement) {
-        styleElement.parentNode.removeChild(styleElement);
+        styleElement.parentNode?.removeChild(styleElement);
       }
     }
   });
@@ -18,26 +18,21 @@ const clearStyles = (fileNames: string[]) => {
 const loadStyles = async (fileNames: string[]) => {
   for (const fileName of fileNames) {
     const id = textToCamelcase(fileName);
-    const filePath = `style/css/${fileName}.css`;
+    const styleElement =
+      document.getElementById(id) || document.createElement("style");
 
-    let styleElement = document.getElementById(id);
-    if (!styleElement) {
-      styleElement = document.createElement("style");
+    if (!document.getElementById(id)) {
       styleElement.id = id;
       styleElement.className = "dncStl";
       document.head.appendChild(styleElement);
     }
 
     try {
-      const response = await fetch(filePath);
-      const text = await response.text();
-      if (!response.ok) {
-        styleElement.textContent = "🚫";
-      } else {
-        styleElement.textContent = text;
-      }
+      const { default: text } = await import(`../../style/css/${fileName}.css`);
+      styleElement.textContent = text;
     } catch (error) {
       console.error(error);
+      styleElement.textContent = "🚫";
     }
   }
 };
