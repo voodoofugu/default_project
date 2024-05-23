@@ -1,13 +1,19 @@
 import { useEffect, useRef } from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
-const clearStyles = (fileNames: string[]) => {
-  const existingStl = document.querySelectorAll(".dncStl");
-  const existingIds = Array.from(existingStl).map((el) => el.id);
+const clearStyles = (parent: string, fileNames?: string[]) => {
+  const existingStl = document.head.querySelectorAll(`[${parent}="⚡"]`);
+  const existingArgs = Array.from(existingStl).map((el) => el.id);
 
-  existingIds.forEach((id) => {
-    if (!fileNames.includes(id)) {
-      const styleElement = document.getElementById(id);
+  existingArgs.forEach((arg) => {
+    const styleElement = document.getElementById(arg);
+    if (fileNames) {
+      if (!fileNames.includes(arg)) {
+        if (styleElement) {
+          styleElement.parentNode?.removeChild(styleElement);
+        }
+      }
+    } else {
       if (styleElement) {
         styleElement.parentNode?.removeChild(styleElement);
       }
@@ -15,7 +21,7 @@ const clearStyles = (fileNames: string[]) => {
   });
 };
 
-const loadStyles = async (fileNames: string[]) => {
+const loadStyles = async (parent: string, fileNames: string[]) => {
   for (const fileName of fileNames) {
     const id = textToCamelcase(fileName);
     const styleElement =
@@ -23,7 +29,7 @@ const loadStyles = async (fileNames: string[]) => {
 
     if (!document.getElementById(id)) {
       styleElement.id = id;
-      styleElement.className = "dncStl";
+      styleElement.setAttribute(`${parent}`, "⚡");
       document.head.appendChild(styleElement);
     }
 
@@ -37,17 +43,23 @@ const loadStyles = async (fileNames: string[]) => {
   }
 };
 
-export default function useDynamicStyle(fileNames: string[]) {
-  const prevFileNamesRef = useRef<string[]>([]);
+const useDynamicStyle = (parent: string, fileNames: string[]) => {
+  const prevParamRef = useRef({ parent, fileNames });
 
   useEffect(() => {
-    const prevFileNames = prevFileNamesRef.current;
+    const prevParams = prevParamRef.current;
 
-    loadStyles(fileNames);
-    if (prevFileNames.length > fileNames.length) {
-      clearStyles(fileNames);
+    loadStyles(parent, fileNames);
+    if (prevParams.fileNames.length > fileNames.length) {
+      clearStyles(parent, fileNames);
     }
 
-    prevFileNamesRef.current = fileNames;
-  }, [fileNames]);
-}
+    prevParamRef.current = { parent, fileNames };
+
+    return () => {
+      clearStyles(prevParamRef.current.parent);
+    };
+  }, [parent, fileNames]);
+};
+
+export default useDynamicStyle;
