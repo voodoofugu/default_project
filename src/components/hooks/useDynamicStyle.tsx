@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
 export interface DynamicStyleProps {
@@ -50,17 +50,26 @@ const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
 };
 
 const useDynamicStyle = ({ parent, fileNames }: DynamicStyleProps) => {
-  const prevParamRef = useRef<DynamicStyleProps>({ parent, fileNames });
+  const prevParamRef = React.useRef<DynamicStyleProps>({ parent, fileNames });
 
-  useEffect(() => {
+  const memoizedClearStyles = React.useCallback(() => {
+    clearStyles({ parent, fileNames });
+  }, [parent, fileNames]);
+
+  const memoizedLoadStyles = React.useCallback(() => {
+    loadStyles({ parent, fileNames });
+  }, [parent, fileNames]);
+
+  React.useEffect(() => {
     const prevParams = prevParamRef.current;
 
-    loadStyles({ parent, fileNames });
+    memoizedLoadStyles();
     if (prevParams.fileNames.length > fileNames.length) {
-      clearStyles({ parent, fileNames });
+      memoizedClearStyles();
     }
 
     prevParamRef.current = { parent, fileNames };
+    console.log("useDynamicStyle");
 
     return () => {
       clearStyles({

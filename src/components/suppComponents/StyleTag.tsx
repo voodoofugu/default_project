@@ -1,11 +1,12 @@
 import React from "react";
-import useDynamicStyle, { DynamicStyleProps } from "../hooks/useDynamicStyle";
+import useDynamicStyle from "../hooks/useDynamicStyle";
+import { selectors } from "../stateManage/GlobalStateStor";
 
-const StyleTag: React.FC<DynamicStyleProps> = React.memo(
-  ({ parent, fileNames }) => {
-    useDynamicStyle({ parent, fileNames });
-    return null;
-  }
-);
+const StyleTag = React.memo(() => {
+  const styleData = selectors.useStyleData();
+  useDynamicStyle({ parent: "styleTag", fileNames: [styleData] });
+
+  return null;
+});
 
 export default StyleTag;
