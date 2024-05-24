@@ -2,7 +2,7 @@ import useDynamicStyle from "../hooks/useDynamicStyle";
 import Ep from "./Ep";
 
 export default function Hi() {
-  useDynamicStyle("hi", ["blabla"]);
+  useDynamicStyle({ parent: "hi", fileNames: ["blabla"] });
 
   return (
     <>

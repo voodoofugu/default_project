@@ -1,7 +1,12 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
-const clearStyles = (parent: string, fileNames?: string[]) => {
+export interface DynamicStyleProps {
+  parent: string;
+  fileNames: string[];
+}
+
+const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
   const existingStl = document.head.querySelectorAll(`[${parent}="⚡"]`);
   const existingArgs = Array.from(existingStl).map((el) => el.id);
 
@@ -13,6 +18,7 @@ const clearStyles = (parent: string, fileNames?: string[]) => {
           styleElement.parentNode?.removeChild(styleElement);
         }
       }
+      console.log("removed");
     } else {
       if (styleElement) {
         styleElement.parentNode?.removeChild(styleElement);
@@ -21,7 +27,7 @@ const clearStyles = (parent: string, fileNames?: string[]) => {
   });
 };
 
-const loadStyles = async (parent: string, fileNames: string[]) => {
+const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
   for (const fileName of fileNames) {
     const id = textToCamelcase(fileName);
     const styleElement =
@@ -43,21 +49,24 @@ const loadStyles = async (parent: string, fileNames: string[]) => {
   }
 };
 
-const useDynamicStyle = (parent: string, fileNames: string[]) => {
-  const prevParamRef = useRef({ parent, fileNames });
+const useDynamicStyle = ({ parent, fileNames }: DynamicStyleProps) => {
+  const prevParamRef = useRef<DynamicStyleProps>({ parent, fileNames });
 
   useEffect(() => {
     const prevParams = prevParamRef.current;
 
-    loadStyles(parent, fileNames);
+    loadStyles({ parent, fileNames });
     if (prevParams.fileNames.length > fileNames.length) {
-      clearStyles(parent, fileNames);
+      clearStyles({ parent, fileNames });
     }
 
     prevParamRef.current = { parent, fileNames };
 
     return () => {
-      clearStyles(prevParamRef.current.parent);
+      clearStyles({
+        parent: prevParamRef.current.parent,
+        fileNames: null,
+      });
     };
   }, [parent, fileNames]);
 };
