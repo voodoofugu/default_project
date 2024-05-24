@@ -6,6 +6,5 @@ export default function useAllStatesToStorage() {
 
   React.useEffect(() => {
     sessionStorage.setItem("initialStates", JSON.stringify(state));
-    console.log("useAllStatesToStorage", state);
   }, [state]);
 }

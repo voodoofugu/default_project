@@ -18,7 +18,6 @@ const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
           styleElement.parentNode?.removeChild(styleElement);
         }
       }
-      console.log("removed");
     } else {
       if (styleElement) {
         styleElement.parentNode?.removeChild(styleElement);
@@ -69,15 +68,14 @@ const useDynamicStyle = ({ parent, fileNames }: DynamicStyleProps) => {
     }
 
     prevParamRef.current = { parent, fileNames };
-    console.log("useDynamicStyle");
 
     return () => {
       clearStyles({
         parent: prevParamRef.current.parent,
-        fileNames: null,
+        fileNames: [],
       });
     };
-  }, [parent, fileNames]);
+  }, [parent, fileNames, memoizedLoadStyles, memoizedClearStyles]);
 };
 
 export default useDynamicStyle;
