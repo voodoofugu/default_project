@@ -1,15 +1,37 @@
 import React from "react";
-import useDynamicStyle, { DynamicStyleProps } from "../hooks/useDynamicStyle";
-import { selectors } from "../stateManage/GlobalStateStor";
+import { DynamicStyleProps } from "../hooks/useDynamicStyle";
+import { useDispatch } from "../stateManage/GlobalStateStor";
 
-const StyleTag = React.memo(({ parent, fileNames }: DynamicStyleProps) => {
-  useDynamicStyle({
-    parent: parent,
-    fileNames: fileNames,
-  });
-  console.log("StyleTag rendered");
+const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
+  const dispatch = useDispatch();
+
+  const memoizedFileNames = React.useMemo(
+    () => fileNames,
+    [fileNames.join(",")]
+  );
+
+  React.useEffect(() => {
+    dispatch({
+      type: "STYLE_DATA",
+      payload: {
+        parent: parent,
+        fileNames: memoizedFileNames,
+      },
+    });
+  }, [parent, memoizedFileNames]);
+
+  React.useEffect(() => {
+    return () => {
+      dispatch({
+        type: "STYLE_DATA",
+        payload: {
+          parent: parent,
+        },
+      });
+    };
+  }, []);
 
   return null;
-});
+};
 
 export default StyleTag;

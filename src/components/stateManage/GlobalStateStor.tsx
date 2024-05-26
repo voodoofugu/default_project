@@ -1,12 +1,12 @@
 import { ReactNode, Dispatch } from "react";
 import { useImmerReducer } from "use-immer";
 import { createContext, useContextSelector } from "use-context-selector";
-import { initialState, InitialState, Action } from "./reducer";
+import { reducer, initialState, InitialState, Action } from "./reducer";
+import SessionStor from "../suppComponents/SessionStor";
 
 type GlobalStateContextType = [InitialState, Dispatch<Action>];
 interface GlobalStateProviderProps {
-  reducer: (draft: InitialState, action: Action) => InitialState;
-  initialState: InitialState;
+  sessionStor?: boolean;
   children: ReactNode;
 }
 
@@ -36,14 +36,21 @@ export function useDispatch() {
 }
 
 export function GlobalStateProvider({
-  reducer,
-  initialState,
+  sessionStor,
   children,
 }: GlobalStateProviderProps) {
-  const contextValue = useImmerReducer(reducer, initialState);
+  const states = !!sessionStorage.getItem("initialStates")
+    ? JSON.parse(sessionStorage.getItem("initialStates"))
+    : initialState;
+
+  const contextValue = useImmerReducer(
+    reducer,
+    sessionStor ? states : initialState
+  );
 
   return (
     <GlobalStateContext.Provider value={contextValue}>
+      {sessionStor && <SessionStor />}
       {children}
     </GlobalStateContext.Provider>
   );

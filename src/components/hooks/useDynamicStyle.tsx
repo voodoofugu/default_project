@@ -6,27 +6,29 @@ export interface DynamicStyleProps {
   fileNames: string[];
 }
 
-const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
+interface DynamicStyleArray {
+  styleArray: DynamicStyleProps[];
+}
+
+export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
   const existingStl = document.head.querySelectorAll(`[${parent}="⚡"]`);
   const existingArgs = Array.from(existingStl).map((el) => el.id);
 
   existingArgs.forEach((arg) => {
     const styleElement = document.getElementById(arg);
-    if (fileNames) {
-      if (!fileNames.includes(arg)) {
-        if (styleElement) {
-          styleElement.parentNode?.removeChild(styleElement);
-        }
-      }
-    } else {
-      if (styleElement) {
+    if (styleElement) {
+      if (!fileNames || !fileNames.includes(arg)) {
         styleElement.parentNode?.removeChild(styleElement);
       }
     }
   });
+  console.log("Styles cleared");
 };
 
-const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
+const loadStyles = async (
+  { parent, fileNames }: DynamicStyleProps,
+  prevTextContentRef: React.MutableRefObject<{ [key: string]: string }>
+) => {
   for (const fileName of fileNames) {
     const id = textToCamelcase(fileName);
     const styleElement =
@@ -40,7 +42,16 @@ const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
 
     try {
       const { default: text } = await import(`../../style/css/${fileName}.css`);
-      styleElement.textContent = text;
+      prevTextContentRef.current[id] = text;
+
+      if (!styleElement.textContent) {
+        styleElement.textContent = text;
+      } else {
+        if (prevTextContentRef.current[id] !== text) {
+          styleElement.textContent = text;
+          prevTextContentRef.current[id] = text;
+        }
+      }
     } catch (error) {
       console.error(error);
       styleElement.textContent = "🚫";
@@ -48,34 +59,34 @@ const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
   }
 };
 
-const useDynamicStyle = ({ parent, fileNames }: DynamicStyleProps) => {
-  const prevParamRef = React.useRef<DynamicStyleProps>({ parent, fileNames });
-
-  const memoizedClearStyles = React.useCallback(() => {
-    clearStyles({ parent, fileNames });
-  }, [parent, fileNames]);
-
-  const memoizedLoadStyles = React.useCallback(() => {
-    loadStyles({ parent, fileNames });
-  }, [parent, fileNames]);
+const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
+  const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>(styleArray);
+  const prevTextContentRef = React.useRef<{ [key: string]: string }>({});
 
   React.useEffect(() => {
-    const prevParams = prevParamRef.current;
+    styleArray.forEach((styleObj) => {
+      const prevStyle = prevStyleArrayRef.current.find(
+        (s) => s.parent === styleObj.parent
+      );
+      loadStyles(styleObj, prevTextContentRef);
+      if (prevStyle && prevStyle.fileNames.length > styleObj.fileNames.length) {
+        clearStyles(prevStyle);
+      }
+    });
 
-    memoizedLoadStyles();
-    if (prevParams.fileNames.length > fileNames.length) {
-      memoizedClearStyles();
-    }
+    prevStyleArrayRef.current = styleArray;
+  }, [styleArray]);
 
-    prevParamRef.current = { parent, fileNames };
-
-    return () => {
-      clearStyles({
-        parent: prevParamRef.current.parent,
-        fileNames: [],
-      });
-    };
-  }, [parent, fileNames, memoizedLoadStyles, memoizedClearStyles]);
+  // React.useEffect(() => {
+  //   return () => {
+  //     prevStyleArrayRef.current.forEach((styleObj) => {
+  //       clearStyles({
+  //         parent: styleObj.parent,
+  //         fileNames: null,
+  //       });
+  //     });
+  //   };
+  // }, []);
 };
 
 export default useDynamicStyle;

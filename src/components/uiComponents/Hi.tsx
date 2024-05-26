@@ -1,10 +1,10 @@
-import Ep from "./Ep";
+import StyleTag from "../suppComponents/StyleTag";
 
 export default function Hi() {
   return (
     <>
-      <div>Hii!</div>
-      {/* <Ep /> */}
+      <StyleTag parent="hi" fileNames={["blabla"]} />
+      <div>Hiii!</div>
     </>
   );
 }
