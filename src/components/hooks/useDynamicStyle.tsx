@@ -17,12 +17,15 @@ export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
   existingArgs.forEach((arg) => {
     const styleElement = document.getElementById(arg);
     if (styleElement) {
-      if (!fileNames || !fileNames.includes(arg)) {
-        styleElement.parentNode?.removeChild(styleElement);
-      }
+      // if (!fileNames || !fileNames.includes(arg)) {
+      //   styleElement.parentNode?.removeChild(styleElement);
+      // }
+      // if (!fileNames || !fileNames.includes(arg)) {
+      //   styleElement.parentNode?.removeChild(styleElement);
+      // }
+      console.log("existingArgs", existingArgs);
     }
   });
-  console.log("Styles cleared");
 };
 
 const loadStyles = async (
@@ -68,9 +71,24 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
       const prevStyle = prevStyleArrayRef.current.find(
         (s) => s.parent === styleObj.parent
       );
+
       loadStyles(styleObj, prevTextContentRef);
-      if (prevStyle && prevStyle.fileNames.length > styleObj.fileNames.length) {
+
+      if (prevStyle && prevStyleArrayRef.current.length > styleArray.length) {
+        const index = prevStyleArrayRef.current.indexOf(prevStyle);
+        if (index !== -1) {
+          clearStyles(prevStyleArrayRef.current.splice(index, 1)[0]);
+          console.log(
+            "Styles cleared",
+            prevStyleArrayRef.current.splice(index, 1)[0]
+          );
+        }
+      } else if (
+        prevStyle &&
+        prevStyle.fileNames.length > styleObj.fileNames.length
+      ) {
         clearStyles(prevStyle);
+        console.log("Styles cleared", prevStyle);
       }
     });
 
