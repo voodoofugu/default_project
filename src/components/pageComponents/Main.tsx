@@ -6,9 +6,9 @@ import Hi from "../uiComponents/Hi";
 export default function Main(): React.ReactElement {
   return (
     <>
-      <StyleTag parent="main" fileNames={["outputTailwind", "blabla"]} />
+      <StyleTag parent="main" fileNames={["outputTailwind"]} />
       <h1 className="text-3xl font-bold">Hello, React!!</h1>
-      {/* <Hi /> */}
+      <Hi />
     </>
   );
 }

@@ -16,6 +16,12 @@ const StyleTagCore = (): React.ReactElement => {
 
   useDynamicStyle({ styleArray });
 
+  React.useEffect(() => {
+    return () => {
+      console.log("Component unmounted");
+    };
+  }, []);
+
   return null;
 };
 
