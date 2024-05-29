@@ -49,24 +49,23 @@ export const loadStyles = async (
 
     try {
       const { default: text } = await import(`../../style/css/${fileName}.css`);
-      prevTextContentRef.current[styleElement.id] = text;
-      console.log(
-        "prevTextContentRef",
-        prevTextContentRef.current[styleElement.id][0][1].length
-      );
-      console.log("text", text[0][1].length);
 
       if (!styleElement.textContent) {
         styleElement.textContent = text;
       } else {
+        if (!prevTextContentRef.current) {
+          prevTextContentRef.current[styleElement.id] = text;
+        }
+
         if (
           prevTextContentRef.current[styleElement.id][0][1].length !==
           text[0][1].length
         ) {
           console.log("loadStyles");
           styleElement.textContent = text;
-          prevTextContentRef.current[styleElement.id] = text;
         }
+
+        prevTextContentRef.current[styleElement.id] = text;
       }
     } catch (error) {
       console.error(error);
