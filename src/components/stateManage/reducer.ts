@@ -1,5 +1,5 @@
 export interface InitialState {
-  styleData: Array<{ string: string[] }>;
+  styleData: Array<{ parent: string; fileNames?: string }>;
   [key: string]: any;
 }
 
@@ -18,15 +18,15 @@ export function reducer(draft: any, action: Action): any {
       if (action.payload) {
         const { parent, fileNames } = action.payload;
         const existingIndex = draft.styleData.findIndex(
-          (item: Array<{ string: string[] }>) => item.hasOwnProperty(parent)
+          (item: InitialState) => item.parent === parent
         );
 
         if ("fileNames" in action.payload) {
-          // push
+          // push or update
           if (existingIndex !== -1) {
-            draft.styleData[existingIndex][parent] = fileNames;
+            draft.styleData[existingIndex].fileNames = fileNames;
           } else {
-            draft.styleData.push({ [parent]: fileNames });
+            draft.styleData.push({ parent: parent, fileNames: fileNames });
           }
         } else {
           // clear
