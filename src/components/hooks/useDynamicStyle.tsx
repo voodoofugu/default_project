@@ -1,5 +1,6 @@
 import React from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
+import CryptoJS from "crypto-js";
 
 export interface DynamicStyleProps {
   parent?: string;
@@ -40,6 +41,10 @@ export const createStateTag = (parent: string, fileName: string) => {
   return styleElement;
 };
 
+const hashText = (text: string) => {
+  return CryptoJS.SHA256(text).toString();
+};
+
 export const loadStyles = async (
   { parent, fileNames }: DynamicStyleProps,
   prevTextContentRef: React.MutableRefObject<{ [key: string]: string }>
@@ -49,26 +54,25 @@ export const loadStyles = async (
 
     try {
       const { default: text } = await import(`../../style/css/${fileName}.css`);
+      const hashedText = hashText(text);
 
       if (!styleElement.textContent) {
         styleElement.textContent = text;
       } else {
-        if (!prevTextContentRef.current) {
-          prevTextContentRef.current[styleElement.id] = text;
+        let prevЫtyleElementTextHash;
+        if (!prevTextContentRef.current[styleElement.id]) {
+          prevЫtyleElementTextHash =
+            prevTextContentRef.current[styleElement.id];
         }
 
-        if (
-          prevTextContentRef.current[styleElement.id][0][1].length !==
-          text[0][1].length
-        ) {
-          console.log("loadStyles");
+        if (prevЫtyleElementTextHash !== hashedText) {
           styleElement.textContent = text;
         }
 
-        prevTextContentRef.current[styleElement.id] = text;
+        prevTextContentRef.current[styleElement.id] = hashedText;
       }
     } catch (error) {
-      console.error(error);
+      console.error(`Error loading style for ${fileName}:`, error);
       styleElement.textContent = "🚫";
     }
   }
