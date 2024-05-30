@@ -19,7 +19,8 @@ export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
     const styleElement = document.getElementById(id);
     if (styleElement) {
       for (const fileName of fileNames) {
-        if (styleElement.getAttribute("id") === fileName) {
+        if (styleElement.getAttribute("id") !== fileName) {
+          console.log("Cleared styleElement", styleElement);
           styleElement.parentNode?.removeChild(styleElement);
         }
       }
@@ -41,46 +42,37 @@ export const createStateTag = (parent: string, fileName: string) => {
   return styleElement;
 };
 
-const hashText = (text: string) => {
-  return CryptoJS.SHA256(text).toString();
-};
-
-export const loadStyles = async (
-  { parent, fileNames }: DynamicStyleProps,
-  prevTextContentRef: React.MutableRefObject<{ [key: string]: string }>
-) => {
+export const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
   for (const fileName of fileNames) {
     const styleElement = createStateTag(parent, fileName);
 
     try {
       const { default: text } = await import(`../../style/css/${fileName}.css`);
-      const hashedText = hashText(text);
-
-      if (!styleElement.textContent) {
-        styleElement.textContent = text;
-      } else {
-        let prevЫtyleElementTextHash;
-        if (!prevTextContentRef.current[styleElement.id]) {
-          prevЫtyleElementTextHash =
-            prevTextContentRef.current[styleElement.id];
-        }
-
-        if (prevЫtyleElementTextHash !== hashedText) {
-          styleElement.textContent = text;
-        }
-
-        prevTextContentRef.current[styleElement.id] = hashedText;
-      }
+      styleElement.textContent = text;
     } catch (error) {
-      console.error(`Error loading style for ${fileName}:`, error);
+      console.error(`🚫 Error loading style for ${fileName}:`, error);
       styleElement.textContent = "🚫";
     }
   }
+
+  // if (!prevStyleObjRef.current) {
+  //   prevStyleObjRef.current = fileNames;
+  // } else {
+  //   const removedStyles = prevStyleObjRef.current.filter(
+  //     (prevFileName) => !fileNames.includes(prevFileName)
+  //   );
+
+  //   if (removedStyles.length > 0) {
+  //     clearStyles({ parent, fileNames: removedStyles });
+  //   }
+
+  //   prevStyleObjRef.current = fileNames;
+  //   console.log("removedStyles:", removedStyles);
+  // }
 };
 
 const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
   const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>(styleArray);
-  const prevTextContentRef = React.useRef<{ [key: string]: string }>({});
 
   function amptyStyleArray() {
     if (prevStyleArrayRef.current.length > 0) {
@@ -99,7 +91,7 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
           (s) => s.parent === styleObj.parent
         );
 
-        loadStyles(styleObj, prevTextContentRef);
+        loadStyles(styleObj);
 
         if (
           prevParent &&
@@ -116,10 +108,7 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
           removedObjects.forEach((removedObject) => {
             clearStyles(removedObject);
           });
-        } else if (
-          prevParent &&
-          prevParent.fileNames.length > styleObj.fileNames.length
-        ) {
+        } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
           const removedFileNames = prevParent.fileNames.filter(
             (fileName) => !styleObj.fileNames.includes(fileName)
           );
@@ -130,6 +119,13 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
               fileNames: [fileName],
             });
           });
+        } else {
+          prevStyleArrayRef.current.filter((prevFileName) => {
+            return !styleArray.some(
+              (styleObj) => styleObj.parent === prevParent.parent
+            );
+          });
+          // TODO : оопиши условие если именя стиля изменилось, но массивы нет
         }
       });
 
