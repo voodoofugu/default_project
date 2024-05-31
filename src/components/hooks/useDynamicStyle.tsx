@@ -1,6 +1,5 @@
 import React from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
-import CryptoJS from "crypto-js";
 
 export interface DynamicStyleProps {
   parent?: string;
@@ -19,8 +18,7 @@ export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
     const styleElement = document.getElementById(id);
     if (styleElement) {
       for (const fileName of fileNames) {
-        if (styleElement.getAttribute("id") !== fileName) {
-          console.log("Cleared styleElement", styleElement);
+        if (styleElement.getAttribute("id") === fileName) {
           styleElement.parentNode?.removeChild(styleElement);
         }
       }
@@ -30,114 +28,111 @@ export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
 
 export const createStateTag = (parent: string, fileName: string) => {
   const id = textToCamelcase(fileName);
-  const styleElement =
-    document.getElementById(id) || document.createElement("style");
-
-  if (!document.getElementById(id)) {
+  let styleElement = document.getElementById(id) as HTMLStyleElement;
+  if (!styleElement) {
+    styleElement = document.createElement("style");
     styleElement.id = id;
     styleElement.setAttribute(`${parent}`, "⚡");
     document.head.appendChild(styleElement);
   }
-
   return styleElement;
 };
 
-export const loadStyles = async ({ parent, fileNames }: DynamicStyleProps) => {
+export const loadStyles = async (
+  { parent, fileNames }: DynamicStyleProps,
+  onLoad: () => void
+) => {
   for (const fileName of fileNames) {
     const styleElement = createStateTag(parent, fileName);
-
     try {
       const { default: text } = await import(`../../style/css/${fileName}.css`);
       styleElement.textContent = text;
+      if (styleElement.textContent.length > 0) {
+        onLoad();
+      }
     } catch (error) {
       console.error(`🚫 Error loading style for ${fileName}:`, error);
       styleElement.textContent = "🚫";
     }
   }
-
-  // if (!prevStyleObjRef.current) {
-  //   prevStyleObjRef.current = fileNames;
-  // } else {
-  //   const removedStyles = prevStyleObjRef.current.filter(
-  //     (prevFileName) => !fileNames.includes(prevFileName)
-  //   );
-
-  //   if (removedStyles.length > 0) {
-  //     clearStyles({ parent, fileNames: removedStyles });
-  //   }
-
-  //   prevStyleObjRef.current = fileNames;
-  //   console.log("removedStyles:", removedStyles);
-  // }
 };
 
 const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
-  const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>(styleArray);
+  const [allStylesLoaded, setAllStylesLoaded] = React.useState(false);
+  const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>([]);
+  const totalFiles = React.useMemo(() => {
+    return styleArray.reduce(
+      (acc, styleObj) => acc + styleObj.fileNames.length,
+      0
+    );
+  }, [styleArray]);
+  const loadedFilesRef = React.useRef(0);
 
-  function amptyStyleArray() {
+  const handleStyleLoad = React.useCallback(() => {
+    loadedFilesRef.current += 1;
+    if (loadedFilesRef.current === totalFiles) {
+      setAllStylesLoaded(true);
+    }
+  }, [totalFiles]);
+
+  const emptyStyleArray = React.useCallback(() => {
     if (prevStyleArrayRef.current.length > 0) {
       prevStyleArrayRef.current.forEach((styleObj) => {
         clearStyles(styleObj);
       });
     }
-  }
+  }, []);
 
   React.useEffect(() => {
     if (styleArray.length === 0) {
-      amptyStyleArray();
+      emptyStyleArray();
     } else {
       styleArray.forEach((styleObj) => {
         const prevParent = prevStyleArrayRef.current.find(
           (s) => s.parent === styleObj.parent
         );
 
-        loadStyles(styleObj);
-
-        if (
-          prevParent &&
-          prevStyleArrayRef.current.length > styleArray.length
-        ) {
-          const removedObjects = prevStyleArrayRef.current.filter(
-            (prevParent) => {
-              return !styleArray.some(
-                (styleObj) => styleObj.parent === prevParent.parent
-              );
-            }
-          );
-
-          removedObjects.forEach((removedObject) => {
-            clearStyles(removedObject);
-          });
-        } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
-          const removedFileNames = prevParent.fileNames.filter(
+        let removedFileNames: string[] = [];
+        if (prevParent) {
+          removedFileNames = prevParent.fileNames.filter(
             (fileName) => !styleObj.fileNames.includes(fileName)
           );
+        }
 
-          removedFileNames.forEach((fileName) => {
+        loadStyles(styleObj, handleStyleLoad);
+
+        if (prevParent) {
+          if (prevStyleArrayRef.current.length > styleArray.length) {
+            const removedObjects = prevStyleArrayRef.current.filter(
+              (prevParent) => {
+                return !styleArray.some(
+                  (styleObj) => styleObj.parent === prevParent.parent
+                );
+              }
+            );
+            removedObjects.forEach((removedObject) => {
+              clearStyles(removedObject);
+            });
+          } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
             clearStyles({
               parent: styleObj.parent,
-              fileNames: [fileName],
+              fileNames: removedFileNames,
             });
-          });
-        } else {
-          prevStyleArrayRef.current.filter((prevFileName) => {
-            return !styleArray.some(
-              (styleObj) => styleObj.parent === prevParent.parent
-            );
-          });
-          // TODO : оопиши условие если именя стиля изменилось, но массивы нет
+          } else if (removedFileNames.length > 0) {
+            clearStyles({
+              parent: styleObj.parent,
+              fileNames: removedFileNames,
+            });
+          }
         }
       });
 
       prevStyleArrayRef.current = styleArray;
     }
-  }, [styleArray]);
+  }, [styleArray, emptyStyleArray, handleStyleLoad]);
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     amptyStyleArray();
-  //   };
-  // }, []);
+  console.log("useDynamicStyle", allStylesLoaded);
+  return allStylesLoaded;
 };
 
 export default useDynamicStyle;

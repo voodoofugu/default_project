@@ -2,16 +2,17 @@ import React from "react";
 import useDynamicStyle from "../hooks/useDynamicStyle";
 import { selectors } from "../stateManage/GlobalStateStor";
 
-const StyleTagCore = (): React.ReactElement => {
+const StyleTagCore: React.FC<{ onStylesLoaded: () => void }> = ({
+  onStylesLoaded,
+}) => {
   const styleData = selectors.useStyleData();
-
-  useDynamicStyle({ styleArray: styleData });
+  const allStylesLoaded = useDynamicStyle({ styleArray: styleData });
 
   React.useEffect(() => {
-    return () => {
-      console.log("Component unmounted");
-    };
-  }, []);
+    if (allStylesLoaded) {
+      onStylesLoaded();
+    }
+  }, [allStylesLoaded]);
 
   return null;
 };

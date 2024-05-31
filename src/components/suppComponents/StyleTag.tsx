@@ -10,37 +10,6 @@ const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
     [fileNames.join(",")]
   );
 
-  // const hotReloadedFileNames = (): string[] => {
-  //   let updatedFiles: string[] = [];
-
-  //   if (module.hot) {
-  //     module.hot.accept(
-  //       fileNames.map((fileName) => `../../style/css/${fileName}.css`),
-  //       (updatedModules) => {
-  //         updatedModules.forEach((module) => {
-  //           if (module && module.endsWith(".css")) {
-  //             updatedFiles.push(module.split("/").pop()!.replace(".css", ""));
-  //           }
-  //         });
-  //       }
-  //     );
-  //   }
-
-  //   return updatedFiles;
-  // };
-
-  // React.useEffect(() => {
-  //   const updatedFiles = hotReloadedFileNames();
-  //   updatedFiles.forEach((updatedFile) => {
-  //     dispatch({
-  //       type: "STYLE_DATA",
-  //       payload: {
-  //         fileNames: [updatedFile],
-  //       },
-  //     });
-  //   });
-  // }, [hotReloadedFileNames]);
-
   React.useEffect(() => {
     dispatch({
       type: "STYLE_DATA",
