@@ -6,7 +6,7 @@ export default function SessionStor(): React.ReactElement {
   const stateMemo = React.useMemo(() => state, [state]);
 
   React.useEffect(() => {
-    sessionStorage.setItem("initialStates", JSON.stringify(stateMemo));
+    sessionStorage.setItem("initialStates_s", JSON.stringify(stateMemo));
   }, [stateMemo]);
 
   return null;

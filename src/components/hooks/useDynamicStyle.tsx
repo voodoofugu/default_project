@@ -1,5 +1,6 @@
 import React from "react";
 import textToCamelcase from "../../scripts/textToCamelcase";
+import { useDispatch } from "../stateManage/GlobalStateStor";
 
 export interface DynamicStyleProps {
   parent?: string;
@@ -58,8 +59,9 @@ export const loadStyles = async (
 };
 
 const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
-  const [allStylesLoaded, setAllStylesLoaded] = React.useState(false);
+  const dispatch = useDispatch();
   const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>([]);
+
   const totalFiles = React.useMemo(() => {
     return styleArray.reduce(
       (acc, styleObj) => acc + styleObj.fileNames.length,
@@ -71,7 +73,9 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
   const handleStyleLoad = React.useCallback(() => {
     loadedFilesRef.current += 1;
     if (loadedFilesRef.current === totalFiles) {
-      setAllStylesLoaded(true);
+      dispatch({
+        type: "STYLE_LOADED",
+      });
     }
   }, [totalFiles]);
 
@@ -130,9 +134,6 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
       prevStyleArrayRef.current = styleArray;
     }
   }, [styleArray, emptyStyleArray, handleStyleLoad]);
-
-  console.log("useDynamicStyle", allStylesLoaded);
-  return allStylesLoaded;
 };
 
 export default useDynamicStyle;

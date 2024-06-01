@@ -1,12 +1,3 @@
-export interface InitialState {
-  styleData: Array<{ parent: string; fileNames?: string }>;
-  [key: string]: any;
-}
-
-export const initialState: InitialState = {
-  styleData: [],
-};
-
 export interface Action {
   type: string;
   payload?: any;
@@ -14,11 +5,13 @@ export interface Action {
 
 export function reducer(draft: any, action: Action): any {
   switch (action.type) {
+    // initialState ►
     case "STYLE_DATA":
       if (action.payload) {
         const { parent, fileNames } = action.payload;
         const existingIndex = draft.styleData.findIndex(
-          (item: InitialState) => item.parent === parent
+          (item: { parent: string; fileNames?: string }) =>
+            item.parent === parent
         );
 
         if ("fileNames" in action.payload) {
@@ -35,6 +28,15 @@ export function reducer(draft: any, action: Action): any {
           }
         }
       }
+      return draft;
+
+    case "STYLE_LOADED":
+      draft.styleLoaded = true;
+      return draft;
+
+    // initialState_storeSaved ►
+    case "BOOL_STATE":
+      draft.s_booleanState = !draft.booleanState;
       return draft;
 
     default:

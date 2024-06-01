@@ -1,12 +1,14 @@
 import { ReactNode, Dispatch } from "react";
 import { useImmerReducer } from "use-immer";
 import { createContext, useContextSelector } from "use-context-selector";
-import { reducer, initialState, InitialState, Action } from "./reducer";
+import { reducer, Action } from "./reducer";
+import initialState, { InitialStateType } from "./initialState";
+import initialState_s, { InitialState_s } from "./initialState_storeSaved";
 import SessionStor from "../suppComponents/SessionStor";
 
-type GlobalStateContextType = [InitialState, Dispatch<Action>];
+type GlobalStateContextType = [InitialStateType, Dispatch<Action>];
 interface GlobalStateProviderProps {
-  sessionStor?: boolean;
+  storingAll?: boolean;
   children: ReactNode;
 }
 
@@ -14,7 +16,9 @@ const GlobalStateContext = createContext<GlobalStateContextType | undefined>(
   undefined
 );
 
-function generateSelectors(state: InitialState) {
+type CombinedStateType = InitialStateType & InitialState_s;
+
+function generateSelectors(state: CombinedStateType) {
   const selectors: { [key: string]: () => any } = {};
 
   Object.keys(state).forEach((key) => {
@@ -29,28 +33,32 @@ export default function useStore() {
   return useContextSelector(GlobalStateContext, (context) => context?.[0]);
 }
 
-export const selectors = generateSelectors(initialState);
+const combinedState = {
+  ...initialState,
+  ...initialState_s,
+};
+export const selectors = generateSelectors(combinedState);
 
 export function useDispatch() {
   return useContextSelector(GlobalStateContext, (context) => context?.[1]);
 }
 
 export function GlobalStateProvider({
-  sessionStor,
+  storingAll,
   children,
 }: GlobalStateProviderProps) {
-  const states = !!sessionStorage.getItem("initialStates")
-    ? JSON.parse(sessionStorage.getItem("initialStates"))
-    : initialState;
+  const states = !!sessionStorage.getItem("combinedState")
+    ? JSON.parse(sessionStorage.getItem("combinedState"))
+    : combinedState;
 
   const contextValue = useImmerReducer(
     reducer,
-    sessionStor ? states : initialState
+    storingAll ? states : initialState_s
   );
 
   return (
     <GlobalStateContext.Provider value={contextValue}>
-      {sessionStor && <SessionStor />}
+      <SessionStor />
       {children}
     </GlobalStateContext.Provider>
   );
