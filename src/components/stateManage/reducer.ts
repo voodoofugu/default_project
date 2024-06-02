@@ -36,7 +36,7 @@ export function reducer(draft: any, action: Action): any {
 
     // initialState_storeSaved ►
     case "BOOL_STATE":
-      draft.s_booleanState = !draft.booleanState;
+      draft.s_booleanState = action.payload;
       return draft;
 
     default:

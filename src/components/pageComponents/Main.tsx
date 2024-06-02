@@ -1,10 +1,18 @@
 import React from "react";
-import { selectors } from "../stateManage/GlobalStateStor";
+import { selectors, useDispatch } from "../stateManage/GlobalStateStor";
 
 import StyleTag from "../suppComponents/StyleTag";
 
 export default function Main(): React.ReactElement {
   const styleLoaded = selectors.useStyleLoaded();
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch({
+      type: "BOOL_STATE",
+      payload: true,
+    });
+  }, []);
 
   return (
     <>

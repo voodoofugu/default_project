@@ -17,6 +17,10 @@ const GlobalStateContext = createContext<GlobalStateContextType | undefined>(
 );
 
 type CombinedStateType = InitialStateType & InitialState_s;
+const combinedState = {
+  ...initialState,
+  ...initialState_s,
+};
 
 function generateSelectors(state: CombinedStateType) {
   const selectors: { [key: string]: () => any } = {};
@@ -29,36 +33,33 @@ function generateSelectors(state: CombinedStateType) {
   return selectors;
 }
 
-export default function useStore() {
-  return useContextSelector(GlobalStateContext, (context) => context?.[0]);
-}
-
-const combinedState = {
-  ...initialState,
-  ...initialState_s,
-};
 export const selectors = generateSelectors(combinedState);
 
 export function useDispatch() {
   return useContextSelector(GlobalStateContext, (context) => context?.[1]);
 }
 
+export default function useStore() {
+  return useContextSelector(GlobalStateContext, (context) => context?.[0]);
+}
+
 export function GlobalStateProvider({
-  storingAll,
+  storingAll = false,
   children,
 }: GlobalStateProviderProps) {
-  const states = !!sessionStorage.getItem("combinedState")
-    ? JSON.parse(sessionStorage.getItem("combinedState"))
-    : combinedState;
+  const storageStates = !!sessionStorage.getItem("📌 storedStates")
+    ? JSON.parse(sessionStorage.getItem("📌 storedStates"))
+    : initialState_s;
+  console.log(!!sessionStorage.getItem("📌 storedStates"));
 
   const contextValue = useImmerReducer(
     reducer,
-    storingAll ? states : initialState_s
+    storingAll ? { ...storageStates, ...initialState } : combinedState
   );
 
   return (
     <GlobalStateContext.Provider value={contextValue}>
-      <SessionStor />
+      <SessionStor storingAll={storingAll} />
       {children}
     </GlobalStateContext.Provider>
   );

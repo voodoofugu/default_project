@@ -1,10 +1,10 @@
 export interface InitialState_s {
   [key: string]: any;
-  "📌booleanState": boolean;
+  s_booleanState: boolean;
 }
 
 const initialState_s: InitialState_s = {
-  "📌booleanState": false,
+  s_booleanState: false,
 };
 
 export default initialState_s;
