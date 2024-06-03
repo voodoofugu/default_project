@@ -50,12 +50,11 @@ export function GlobalStateProvider({
   const storageStates = !!sessionStorage.getItem("📌 storedStates")
     ? JSON.parse(sessionStorage.getItem("📌 storedStates"))
     : initialState_s;
-  console.log(!!sessionStorage.getItem("📌 storedStates"));
 
-  const contextValue = useImmerReducer(
-    reducer,
-    storingAll ? { ...storageStates, ...initialState } : combinedState
-  );
+  const contextValue = useImmerReducer(reducer, {
+    ...storageStates,
+    ...initialState,
+  });
 
   return (
     <GlobalStateContext.Provider value={contextValue}>

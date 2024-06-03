@@ -1,8 +1,8 @@
 import { useEffect, useState, ComponentType, ReactNode } from "react";
 
-const loadFile = async (filePath: string) => {
+const loadFile = async (filePath: string): Promise<ComponentType<any>> => {
   try {
-    const file = await import(`../${filePath}`);
+    const file = await import(`../uiComponents/${filePath}`);
     return file.default;
   } catch (error) {
     console.error("🚫 Error loading file:", error);
@@ -10,8 +10,11 @@ const loadFile = async (filePath: string) => {
   }
 };
 
-export default function useDynamicLoad(filePath: string): ReactNode {
-  const [file, setFile] = useState<null>(null);
+export default function useDynamicLoad(
+  filePath: string,
+  componentProps: Record<string, any> = {}
+): ReactNode {
+  const [Component, setComponent] = useState<ComponentType<any> | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -19,7 +22,7 @@ export default function useDynamicLoad(filePath: string): ReactNode {
     const load = async () => {
       try {
         const loadedFile = await loadFile(filePath);
-        setFile(loadedFile);
+        setComponent(() => loadedFile);
       } catch (err) {
         setError(err as Error);
       } finally {
@@ -38,5 +41,5 @@ export default function useDynamicLoad(filePath: string): ReactNode {
     return <div>🚫</div>;
   }
 
-  return file;
+  return Component ? <Component {...componentProps} /> : null;
 }

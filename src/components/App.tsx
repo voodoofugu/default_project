@@ -7,7 +7,7 @@ import Main from "./pageComponents/Main";
 
 export default function App(): React.ReactElement {
   return (
-    <GlobalStateProvider>
+    <GlobalStateProvider storingAll>
       <StyleTagCore />
       <Main />
     </GlobalStateProvider>
