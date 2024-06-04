@@ -5,7 +5,7 @@ import { useDispatch } from "../stateManage/GlobalStateStor";
 export interface DynamicStyleProps {
   parent?: string;
   fileNames: string[];
-  styleLoaded?: boolean;
+  stylesLoaded?: boolean;
 }
 
 interface DynamicStyleArray {
@@ -74,10 +74,9 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
           type: "STYLE_DATA",
           payload: {
             parent: parent,
-            styleLoaded: true,
+            stylesLoaded: true,
           },
         });
-        console.log("🎉All styles from " + parent + " loaded");
       }
     },
     []

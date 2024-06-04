@@ -24,7 +24,7 @@ export function reducer(draft: any, action: Action): any {
               stylesLoaded: false,
             });
           }
-        } else if ("styleLoaded" in action.payload) {
+        } else if ("stylesLoaded" in action.payload) {
           // styles loaded
           if (existingIndex !== -1) {
             draft.styleData[existingIndex].stylesLoaded = stylesLoaded;

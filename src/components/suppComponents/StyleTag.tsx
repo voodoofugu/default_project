@@ -1,9 +1,17 @@
 import React from "react";
 import { DynamicStyleProps } from "../hooks/useDynamicStyle";
-import { useDispatch } from "../stateManage/GlobalStateStor";
+import { selectors, useDispatch } from "../stateManage/GlobalStateStor";
 
 const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
+  const styleData = selectors.useStyleData();
   const dispatch = useDispatch();
+
+  let stylesLoaded = false;
+  styleData.forEach((styleObj: any) => {
+    if (styleObj.parent === parent) {
+      stylesLoaded = styleObj.stylesLoaded;
+    }
+  });
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,

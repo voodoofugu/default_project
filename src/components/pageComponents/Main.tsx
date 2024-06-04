@@ -1,16 +1,16 @@
 import React from "react";
-import { selectors } from "../stateManage/GlobalStateStor";
 
 import StyleTag from "../suppComponents/StyleTag";
 import Hi from "../uiComponents/Hi";
 
 export default function Main(): React.ReactElement {
-  const styleData = selectors.useStyleData();
+  let stylesLoaded = false;
 
   return (
     <>
-      <StyleTag parent="main" fileNames={["outputTailwind"]} />
-      {styleData ? (
+      <StyleTag parent="main" fileNames={["outputTailwind"]} stylesLoaded />
+      {console.log(typeof StyleTag)}
+      {StyleTag !== null ? (
         <>
           <h1 className="text-3xl font-bold">Hello, React!!</h1>
           <Hi />
