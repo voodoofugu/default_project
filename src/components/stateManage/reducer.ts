@@ -8,18 +8,26 @@ export function reducer(draft: any, action: Action): any {
     // initialState ►
     case "STYLE_DATA":
       if (action.payload) {
-        const { parent, fileNames } = action.payload;
+        const { parent, fileNames, stylesLoaded } = action.payload;
         const existingIndex = draft.styleData.findIndex(
-          (item: { parent: string; fileNames?: string }) =>
-            item.parent === parent
+          (item: { parent: string }) => item.parent === parent
         );
 
         if ("fileNames" in action.payload) {
-          // push or update
+          // push/update
           if (existingIndex !== -1) {
             draft.styleData[existingIndex].fileNames = fileNames;
           } else {
-            draft.styleData.push({ parent: parent, fileNames: fileNames });
+            draft.styleData.push({
+              parent: parent,
+              fileNames: fileNames,
+              stylesLoaded: false,
+            });
+          }
+        } else if ("styleLoaded" in action.payload) {
+          // styles loaded
+          if (existingIndex !== -1) {
+            draft.styleData[existingIndex].stylesLoaded = stylesLoaded;
           }
         } else {
           // clear
@@ -28,10 +36,6 @@ export function reducer(draft: any, action: Action): any {
           }
         }
       }
-      return draft;
-
-    case "STYLE_LOADED":
-      draft.styleLoaded = true;
       return draft;
 
     // initialState_storeSaved ►

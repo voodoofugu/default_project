@@ -5,6 +5,7 @@ import { useDispatch } from "../stateManage/GlobalStateStor";
 export interface DynamicStyleProps {
   parent?: string;
   fileNames: string[];
+  styleLoaded?: boolean;
 }
 
 interface DynamicStyleArray {
@@ -41,7 +42,7 @@ export const createStateTag = (parent: string, fileName: string) => {
 
 export const loadStyles = async (
   { parent, fileNames }: DynamicStyleProps,
-  onLoad: () => void
+  onLoad: (parent: string, totalFiles: number) => void
 ) => {
   for (const fileName of fileNames) {
     const styleElement = createStateTag(parent, fileName);
@@ -49,7 +50,7 @@ export const loadStyles = async (
       const { default: text } = await import(`../../style/css/${fileName}.css`);
       styleElement.textContent = text;
       if (styleElement.textContent.length > 0) {
-        onLoad();
+        onLoad(parent, fileNames.length);
       }
     } catch (error) {
       console.error(`🚫 Error loading style for ${fileName}:`, error);
@@ -62,22 +63,25 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
   const dispatch = useDispatch();
   const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>([]);
 
-  const totalFiles = React.useMemo(() => {
-    return styleArray.reduce(
-      (acc, styleObj) => acc + styleObj.fileNames.length,
-      0
-    );
-  }, [styleArray]);
-  const loadedFilesRef = React.useRef(0);
+  const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
-  const handleStyleLoad = React.useCallback(() => {
-    loadedFilesRef.current += 1;
-    if (loadedFilesRef.current === totalFiles) {
-      dispatch({
-        type: "STYLE_LOADED",
-      });
-    }
-  }, [totalFiles]);
+  const handleStyleLoad = React.useCallback(
+    (parent: string, totalFiles: number) => {
+      loadedFilesRef.current = { loadedFiles: 0 };
+      loadedFilesRef.current.loadedFiles += 1;
+      if (loadedFilesRef.current.loadedFiles === totalFiles) {
+        dispatch({
+          type: "STYLE_DATA",
+          payload: {
+            parent: parent,
+            styleLoaded: true,
+          },
+        });
+        console.log("🎉All styles from " + parent + " loaded");
+      }
+    },
+    []
+  );
 
   const emptyStyleArray = React.useCallback(() => {
     if (prevStyleArrayRef.current.length > 0) {
