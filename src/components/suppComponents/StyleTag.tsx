@@ -2,9 +2,13 @@ import React from "react";
 import { DynamicStyleProps } from "../hooks/useDynamicStyle";
 import { selectors, useDispatch } from "../stateManage/GlobalStateStor";
 
-const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
+interface StyleTagProps extends DynamicStyleProps {
+  children?: React.ReactNode;
+  loadingElement?: React.ReactNode;
+}
+
+export const styleLoading = ({ parent }: DynamicStyleProps) => {
   const styleData = selectors.useStyleData();
-  const dispatch = useDispatch();
 
   let stylesLoaded = false;
   styleData.forEach((styleObj: any) => {
@@ -12,6 +16,17 @@ const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
       stylesLoaded = styleObj.stylesLoaded;
     }
   });
+
+  return stylesLoaded ? true : false;
+};
+
+const StyleTag = ({
+  parent,
+  fileNames,
+  children,
+  loadingElement,
+}: StyleTagProps) => {
+  const dispatch = useDispatch();
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,
@@ -39,7 +54,19 @@ const StyleTag: React.FC<DynamicStyleProps> = ({ parent, fileNames }) => {
     };
   }, []);
 
-  return null;
+  if (children) {
+    return (
+      <>
+        {styleLoading({ parent: parent })
+          ? children
+          : loadingElement
+          ? loadingElement
+          : "Loading..."}
+      </>
+    );
+  } else {
+    return null;
+  }
 };
 
 export default StyleTag;

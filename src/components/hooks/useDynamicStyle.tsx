@@ -4,7 +4,7 @@ import { useDispatch } from "../stateManage/GlobalStateStor";
 
 export interface DynamicStyleProps {
   parent?: string;
-  fileNames: string[];
+  fileNames?: string[];
   stylesLoaded?: boolean;
 }
 
@@ -41,20 +41,27 @@ export const createStateTag = (parent: string, fileName: string) => {
 };
 
 export const loadStyles = async (
-  { parent, fileNames }: DynamicStyleProps,
-  onLoad: (parent: string, totalFiles: number) => void
+  { parent, fileNames, stylesLoaded }: DynamicStyleProps,
+  onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
-  for (const fileName of fileNames) {
-    const styleElement = createStateTag(parent, fileName);
-    try {
-      const { default: text } = await import(`../../style/css/${fileName}.css`);
-      styleElement.textContent = text;
-      if (styleElement.textContent.length > 0) {
-        onLoad(parent, fileNames.length);
+  if (fileNames.length === 0) {
+    onLoad(parent, 0, stylesLoaded);
+    console.log(`🚫 Your array with the parent name "${parent}" is empty`);
+  } else {
+    for (const fileName of fileNames) {
+      const styleElement = createStateTag(parent, fileName);
+      try {
+        const { default: text } = await import(
+          `../../style/css/${fileName}.css`
+        );
+        styleElement.textContent = text;
+        if (styleElement.textContent.length > 0) {
+          onLoad(parent, fileNames.length, stylesLoaded);
+        }
+      } catch (error) {
+        console.error(`🚫 Error loading style for ${fileName}:`, error);
+        styleElement.textContent = "🚫";
       }
-    } catch (error) {
-      console.error(`🚫 Error loading style for ${fileName}:`, error);
-      styleElement.textContent = "🚫";
     }
   }
 };
@@ -66,10 +73,17 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
   const handleStyleLoad = React.useCallback(
-    (parent: string, totalFiles: number) => {
-      loadedFilesRef.current = { loadedFiles: 0 };
-      loadedFilesRef.current.loadedFiles += 1;
-      if (loadedFilesRef.current.loadedFiles === totalFiles) {
+    (parent: string, totalFiles: number, stylesLoaded: boolean) => {
+      if (loadedFilesRef.current.loadedFiles === 0) {
+        loadedFilesRef.current = { loadedFiles: 0 };
+      }
+      if (loadedFilesRef.current.loadedFiles < totalFiles) {
+        loadedFilesRef.current.loadedFiles += 1;
+      }
+      if (
+        totalFiles === 0 ||
+        (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
+      ) {
         dispatch({
           type: "STYLE_DATA",
           payload: {
