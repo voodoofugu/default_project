@@ -1,10 +1,13 @@
 import React from "react";
 import useDynamicStyle from "../hooks/useDynamicStyle";
-import { selectors } from "../stateManage/GlobalStateStor";
+import { useStoreContext } from "../stateManage/Provider";
+import { InitialStatesType } from "../stateManage/initialStates";
 
 const StyleTagCore: React.FC = () => {
-  const styleData = selectors.useStyleData();
-  useDynamicStyle({ styleArray: styleData });
+  const [styleData, setStyleData] =
+    useStoreContext<InitialStatesType["styleData"]>("styleData");
+
+  useDynamicStyle({ styleData, setStyleData });
 
   return null;
 };

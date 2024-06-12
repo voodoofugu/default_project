@@ -1,19 +1,25 @@
 import React from "react";
-import { DynamicStyleProps } from "../hooks/useDynamicStyle";
-import { selectors, useDispatch } from "../stateManage/GlobalStateStor";
+import { InitialStatesType } from "../stateManage/initialStates";
+import { useStoreContext } from "../stateManage/Provider";
 
-interface StyleTagProps extends DynamicStyleProps {
+interface StyleTagProps {
+  parent: InitialStatesType["parent"];
+  fileNames: InitialStatesType["fileNames"];
   children?: React.ReactNode;
   loadingElement?: React.ReactNode;
 }
 
-export const styleLoading = ({ parent }: DynamicStyleProps) => {
-  const styleData = selectors.useStyleData();
-
+export const styleLoading = ({
+  parent,
+  styleData,
+}: {
+  parent: StyleTagProps["parent"];
+  styleData: InitialStatesType["styleData"];
+}) => {
   let stylesLoaded = false;
-  styleData.forEach((styleObj: any) => {
+  styleData.forEach((styleObj) => {
     if (styleObj.parent === parent) {
-      stylesLoaded = styleObj.stylesLoaded;
+      stylesLoaded = styleObj.stylesLoaded ?? false;
     }
   });
 
@@ -26,7 +32,8 @@ const StyleTag = ({
   children,
   loadingElement,
 }: StyleTagProps) => {
-  const dispatch = useDispatch();
+  const [styleData, setStyleData] =
+    useStoreContext<InitialStatesType["styleData"]>("styleData");
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,
@@ -34,30 +41,31 @@ const StyleTag = ({
   );
 
   React.useEffect(() => {
-    dispatch({
+    setStyleData({
       type: "STYLE_DATA",
       payload: {
         parent: parent,
         fileNames: memoizedFileNames,
       },
     });
-  }, [parent, memoizedFileNames]);
+  }, [parent, memoizedFileNames, setStyleData]);
 
   React.useEffect(() => {
     return () => {
-      dispatch({
+      setStyleData({
         type: "STYLE_DATA",
         payload: {
           parent: parent,
+          fileNames: [],
         },
       });
     };
-  }, []);
+  }, [parent, setStyleData]);
 
   if (children) {
     return (
       <>
-        {styleLoading({ parent: parent })
+        {styleLoading({ parent: parent, styleData: styleData })
           ? children
           : loadingElement
           ? loadingElement

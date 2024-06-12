@@ -1,24 +1,22 @@
 import React from "react";
+import { InitialStatesType } from "../stateManage/initialStates";
 import textToCamelcase from "../../scripts/textToCamelcase";
-import { useDispatch } from "../stateManage/GlobalStateStor";
 
-export interface DynamicStyleProps {
-  parent?: string;
-  fileNames?: string[];
-  stylesLoaded?: boolean;
+export interface DynamicStyleArray {
+  styleData: InitialStatesType["styleData"];
+  setStyleData: (value: { type: string; payload: any }) => void;
 }
 
-interface DynamicStyleArray {
-  styleArray: DynamicStyleProps[];
-}
-
-export const clearStyles = ({ parent, fileNames }: DynamicStyleProps) => {
+export const clearStyles = ({
+  parent,
+  fileNames,
+}: InitialStatesType["styleData"][0]) => {
   const argsForRemove = document.head.querySelectorAll(`[${parent}="⚡"]`);
   const idsForRemove = Array.from(argsForRemove).map((el) => el.id);
 
   idsForRemove.forEach((id) => {
     const styleElement = document.getElementById(id);
-    if (styleElement) {
+    if (styleElement && fileNames) {
       for (const fileName of fileNames) {
         if (styleElement.getAttribute("id") === fileName) {
           styleElement.parentNode?.removeChild(styleElement);
@@ -41,10 +39,10 @@ export const createStateTag = (parent: string, fileName: string) => {
 };
 
 export const loadStyles = async (
-  { parent, fileNames, stylesLoaded }: DynamicStyleProps,
+  { parent, fileNames, stylesLoaded }: InitialStatesType["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
-  if (fileNames.length === 0) {
+  if (!fileNames || fileNames.length === 0) {
     onLoad(parent, 0, stylesLoaded);
     console.log(`🚫 Your array with the parent name "${parent}" is empty`);
   } else {
@@ -66,10 +64,8 @@ export const loadStyles = async (
   }
 };
 
-const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
-  const dispatch = useDispatch();
-  const prevStyleArrayRef = React.useRef<DynamicStyleProps[]>([]);
-
+const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
+  const prevStyleArrayRef = React.useRef<InitialStatesType["styleData"]>([]);
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
   const handleStyleLoad = React.useCallback(
@@ -84,7 +80,7 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
         totalFiles === 0 ||
         (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
       ) {
-        dispatch({
+        setStyleData({
           type: "STYLE_DATA",
           payload: {
             parent: parent,
@@ -93,7 +89,7 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
         });
       }
     },
-    []
+    [setStyleData]
   );
 
   const emptyStyleArray = React.useCallback(() => {
@@ -105,10 +101,10 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
   }, []);
 
   React.useEffect(() => {
-    if (styleArray.length === 0) {
+    if (styleData.length === 0) {
       emptyStyleArray();
     } else {
-      styleArray.forEach((styleObj) => {
+      styleData.forEach((styleObj) => {
         const prevParent = prevStyleArrayRef.current.find(
           (s) => s.parent === styleObj.parent
         );
@@ -123,10 +119,10 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
         loadStyles(styleObj, handleStyleLoad);
 
         if (prevParent) {
-          if (prevStyleArrayRef.current.length > styleArray.length) {
+          if (prevStyleArrayRef.current.length > styleData.length) {
             const removedObjects = prevStyleArrayRef.current.filter(
               (prevParent) => {
-                return !styleArray.some(
+                return !styleData.some(
                   (styleObj) => styleObj.parent === prevParent.parent
                 );
               }
@@ -148,9 +144,9 @@ const useDynamicStyle = ({ styleArray }: DynamicStyleArray) => {
         }
       });
 
-      prevStyleArrayRef.current = styleArray;
+      prevStyleArrayRef.current = styleData;
     }
-  }, [styleArray, emptyStyleArray, handleStyleLoad]);
+  }, [styleData, emptyStyleArray, handleStyleLoad]);
 };
 
 export default useDynamicStyle;
