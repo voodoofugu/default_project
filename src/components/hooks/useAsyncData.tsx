@@ -1,33 +1,36 @@
 import { useState, useEffect } from "react";
 
-const useAsyncData = (
-  asyncFunction: () => Promise<any>,
-  dependencies: any[]
-) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const useAsyncData = (data: any) => {
+  const [asyncData, setAsyncData] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
-    asyncFunction()
-      .then((result) => {
-        if (isMounted) {
-          setData(result);
-          setLoading(false);
-        }
-      })
-      .catch((error) => {
-        if (isMounted) {
-          console.error(error);
-          setLoading(false);
-        }
+
+    const waitForData = (data: any) => {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (data !== null && data.length !== 0) {
+            resolve(data);
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        check();
       });
+    };
+
+    waitForData(data).then((resolvedData) => {
+      if (isMounted) {
+        setAsyncData(resolvedData);
+      }
+    });
+
     return () => {
       isMounted = false;
     };
-  }, dependencies);
+  }, [data]);
 
-  return { data, loading };
+  return asyncData;
 };
 
 export default useAsyncData;

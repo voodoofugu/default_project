@@ -1,78 +1,75 @@
-// import React from "react";
-// import { selectors, useDispatch } from "../stateManage/GlobalStateStor";
+import React, { useEffect, useState } from "react";
+import { useStoreContext } from "../stateManage/Provider";
 
-// export default function useRequest(requestName: string, url: string) {
-//   const requestNameNew = `use${
-//     requestName.charAt(0).toUpperCase() + requestName.slice(1)
-//   }`;
-//   const requestData = selectors[requestNameNew]();
-//   const dispatch = useDispatch();
+interface RequestState {
+  data?: any;
+  requestLoaded?: boolean;
+}
 
-//   React.useEffect(() => {
-//     let isMounted = true;
+export default function useRequest(requestName: string, url: string) {
+  const [requestData, setRequestData] =
+    useStoreContext<RequestState>(requestName);
+  const [loading, setLoading] = useState(true);
 
-//     const fetchData = async () => {
-//       try {
-//         const response = await fetch(url);
+  useEffect(() => {
+    let isMounted = true;
 
-//         if (!isMounted) return;
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
 
-//         if (!response.ok) {
-//           throw new Error(response.statusText);
-//         }
+        if (!isMounted) return;
 
-//         const json = await response.json();
-//         if (isMounted) {
-//           dispatch({
-//             type: "REQUEST_DATA",
-//             payload: {
-//               requestName,
-//               data: json,
-//             },
-//           });
-//         }
-//       } catch (error) {
-//         console.error(error);
-//         if (isMounted) {
-//           dispatch({
-//             type: "REQUEST_DATA",
-//             payload: {
-//               requestName,
-//               data: "🚫",
-//             },
-//           });
-//         }
-//       } finally {
-//         if (isMounted) {
-//           dispatch({
-//             type: "REQUEST_DATA",
-//             payload: {
-//               requestName,
-//               requestLoaded: true,
-//             },
-//           });
-//         }
-//       }
-//     };
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
 
-//     fetchData();
+        const json = await response.json();
+        if (isMounted) {
+          setRequestData({
+            type: "REQUEST_DATA",
+            payload: {
+              requestName,
+              data: json,
+              requestLoaded: true,
+            },
+          });
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error(error);
+        if (isMounted) {
+          setRequestData({
+            type: "REQUEST_DATA",
+            payload: {
+              requestName,
+              data: "🚫",
+              requestLoaded: false,
+            },
+          });
+          setLoading(false);
+        }
+      }
+    };
 
-//     return () => {
-//       isMounted = false;
-//       dispatch({
-//         type: "REQUEST_DATA",
-//         payload: {
-//           requestName,
-//         },
-//       });
-//     };
-//   }, [requestName, url]);
+    fetchData();
 
-//   const request = requestData ? requestData : undefined;
+    return () => {
+      isMounted = false;
+      setRequestData({
+        type: "REQUEST_DATA",
+        payload: {
+          requestName,
+          data: undefined,
+          requestLoaded: false,
+        },
+      });
+    };
+  }, [requestName, url, setRequestData]);
 
-//   return {
-//     data: request ? request.data : undefined,
-//     requestLoaded:
-//       request && request.data !== "🚫" ? request.requestLoaded : undefined,
-//   };
-// }
+  return {
+    data: requestData ? requestData.data : undefined,
+    requestLoaded: requestData ? requestData.requestLoaded : false,
+    loading,
+  };
+}

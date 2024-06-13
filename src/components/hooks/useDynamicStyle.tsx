@@ -1,6 +1,7 @@
 import React from "react";
 import { InitialStatesType } from "../stateManage/initialStates";
 import textToCamelcase from "../../scripts/textToCamelcase";
+import useAsyncData from "./useAsyncData";
 
 export interface DynamicStyleArray {
   styleData: InitialStatesType["styleData"];
@@ -101,57 +102,60 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
     }
   }, []);
 
+  const asyncStyleData = useAsyncData(styleData); // Используем асинхронный хук
+
   React.useEffect(() => {
-    setTimeout(() => {
-      if (styleData.length === 0) {
-        emptyStyleArray();
-      } else if (styleData.length > 0) {
-        styleData.forEach((styleObj) => {
-          const prevParent = prevStyleArrayRef.current.find(
-            (s) => s.parent === styleObj.parent
-          );
+    if (!asyncStyleData) {
+      emptyStyleArray();
+      return;
+    }
 
-          let removedFileNames: string[] = [];
-          if (prevParent) {
-            removedFileNames = prevParent.fileNames.filter(
-              (fileName) => !styleObj.fileNames.includes(fileName)
-            );
-          }
+    loadStyleArray(asyncStyleData);
+  }, [asyncStyleData]);
 
-          loadStyles(styleObj, handleStyleLoad);
+  const loadStyleArray = (styleData: InitialStatesType["styleData"]) => {
+    styleData.forEach((styleObj) => {
+      const prevParent = prevStyleArrayRef.current.find(
+        (s) => s.parent === styleObj.parent
+      );
 
-          if (prevParent) {
-            if (prevStyleArrayRef.current.length > styleData.length) {
-              const removedObjects = prevStyleArrayRef.current.filter(
-                (prevParent) => {
-                  return !styleData.some(
-                    (styleObj) => styleObj.parent === prevParent.parent
-                  );
-                }
+      let removedFileNames: string[] = [];
+      if (prevParent) {
+        removedFileNames = prevParent.fileNames.filter(
+          (fileName) => !styleObj.fileNames.includes(fileName)
+        );
+      }
+
+      loadStyles(styleObj, handleStyleLoad);
+
+      if (prevParent) {
+        if (prevStyleArrayRef.current.length > styleData.length) {
+          const removedObjects = prevStyleArrayRef.current.filter(
+            (prevParent) => {
+              return !styleData.some(
+                (styleObj) => styleObj.parent === prevParent.parent
               );
-              removedObjects.forEach((removedObject) => {
-                clearStyles(removedObject);
-              });
-            } else if (
-              prevParent.fileNames.length > styleObj.fileNames.length
-            ) {
-              clearStyles({
-                parent: styleObj.parent,
-                fileNames: removedFileNames,
-              });
-            } else if (removedFileNames.length > 0) {
-              clearStyles({
-                parent: styleObj.parent,
-                fileNames: removedFileNames,
-              });
             }
-          }
-        });
-
-        prevStyleArrayRef.current = styleData;
+          );
+          removedObjects.forEach((removedObject) => {
+            clearStyles(removedObject);
+          });
+        } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
+          clearStyles({
+            parent: styleObj.parent,
+            fileNames: removedFileNames,
+          });
+        } else if (removedFileNames.length > 0) {
+          clearStyles({
+            parent: styleObj.parent,
+            fileNames: removedFileNames,
+          });
+        }
       }
     });
-  }, [styleData]);
+
+    prevStyleArrayRef.current = styleData;
+  };
 };
 
 export default useDynamicStyle;

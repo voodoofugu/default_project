@@ -16,8 +16,8 @@ export const styleLoading = ({
   parent: StyleTagProps["parent"];
   styleData: InitialStatesType["styleData"];
 }) => {
-  console.log(styleData);
   let stylesLoaded = false;
+  console.log(styleData);
   styleData.forEach((styleObj) => {
     if (styleObj.parent === parent) {
       stylesLoaded = styleObj.stylesLoaded ?? false;
