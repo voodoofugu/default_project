@@ -16,6 +16,7 @@ export const styleLoading = ({
   parent: StyleTagProps["parent"];
   styleData: InitialStatesType["styleData"];
 }) => {
+  console.log(styleData);
   let stylesLoaded = false;
   styleData.forEach((styleObj) => {
     if (styleObj.parent === parent) {
@@ -56,7 +57,6 @@ const StyleTag = ({
         type: "STYLE_DATA",
         payload: {
           parent: parent,
-          fileNames: [],
         },
       });
     };

@@ -42,10 +42,10 @@ export const loadStyles = async (
   { parent, fileNames, stylesLoaded }: InitialStatesType["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
-  console.log("loadStyles");
-  if (!fileNames || fileNames.length === 0) {
+  console.log(stylesLoaded);
+  if (fileNames.length === 0) {
     onLoad(parent, 0, stylesLoaded);
-    console.log(`🚫 Your array with the parent name "${parent}" is empty`);
+    console.log(`🚫 Array with the parent "${parent}" is empty`);
   } else {
     for (const fileName of fileNames) {
       const styleElement = createStateTag(parent, fileName);
@@ -102,54 +102,55 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
   }, []);
 
   React.useEffect(() => {
-    console.log("styleData:", styleData);
-    if (styleData.length === 0) {
-      emptyStyleArray();
-      console.log("emptyStyleArray");
-    } else if (styleData.length > 0) {
-      console.log("loadStyleArray");
-      styleData.forEach((styleObj) => {
-        const prevParent = prevStyleArrayRef.current.find(
-          (s) => s.parent === styleObj.parent
-        );
-
-        let removedFileNames: string[] = [];
-        if (prevParent) {
-          removedFileNames = prevParent.fileNames.filter(
-            (fileName) => !styleObj.fileNames.includes(fileName)
+    setTimeout(() => {
+      if (styleData.length === 0) {
+        emptyStyleArray();
+      } else if (styleData.length > 0) {
+        styleData.forEach((styleObj) => {
+          const prevParent = prevStyleArrayRef.current.find(
+            (s) => s.parent === styleObj.parent
           );
-        }
 
-        loadStyles(styleObj, handleStyleLoad);
-
-        if (prevParent) {
-          if (prevStyleArrayRef.current.length > styleData.length) {
-            const removedObjects = prevStyleArrayRef.current.filter(
-              (prevParent) => {
-                return !styleData.some(
-                  (styleObj) => styleObj.parent === prevParent.parent
-                );
-              }
+          let removedFileNames: string[] = [];
+          if (prevParent) {
+            removedFileNames = prevParent.fileNames.filter(
+              (fileName) => !styleObj.fileNames.includes(fileName)
             );
-            removedObjects.forEach((removedObject) => {
-              clearStyles(removedObject);
-            });
-          } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
-            clearStyles({
-              parent: styleObj.parent,
-              fileNames: removedFileNames,
-            });
-          } else if (removedFileNames.length > 0) {
-            clearStyles({
-              parent: styleObj.parent,
-              fileNames: removedFileNames,
-            });
           }
-        }
-      });
 
-      prevStyleArrayRef.current = styleData;
-    }
+          loadStyles(styleObj, handleStyleLoad);
+
+          if (prevParent) {
+            if (prevStyleArrayRef.current.length > styleData.length) {
+              const removedObjects = prevStyleArrayRef.current.filter(
+                (prevParent) => {
+                  return !styleData.some(
+                    (styleObj) => styleObj.parent === prevParent.parent
+                  );
+                }
+              );
+              removedObjects.forEach((removedObject) => {
+                clearStyles(removedObject);
+              });
+            } else if (
+              prevParent.fileNames.length > styleObj.fileNames.length
+            ) {
+              clearStyles({
+                parent: styleObj.parent,
+                fileNames: removedFileNames,
+              });
+            } else if (removedFileNames.length > 0) {
+              clearStyles({
+                parent: styleObj.parent,
+                fileNames: removedFileNames,
+              });
+            }
+          }
+        });
+
+        prevStyleArrayRef.current = styleData;
+      }
+    });
   }, [styleData]);
 };
 
