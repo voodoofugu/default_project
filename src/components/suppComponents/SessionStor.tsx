@@ -1,37 +1,40 @@
-// import React from "react";
-// import useStore from "../stateManage/GlobalStateStor";
+import React from "react";
+import { useAllStoreContext } from "../stateManage/Provider";
 
-// interface SessionStorProps {
-//   storingAll?: boolean;
-// }
+export interface StoringAllType {
+  storingAll?: boolean;
+}
 
-// export default function SessionStor({
-//   storingAll = false,
-// }: SessionStorProps): React.ReactElement {
-//   const state = useStore();
-//   const { statesForWatch, storedStates } = React.useMemo(() => {
-//     const storedStates = Object.fromEntries(
-//       Object.entries(state).filter(([key]) => key.startsWith("s_"))
-//     );
-//     const statesForWatch = Object.fromEntries(
-//       Object.entries(state).filter(([key]) => !key.startsWith("s_"))
-//     );
-//     return { statesForWatch, storedStates };
-//   }, [state]);
+interface SessionStorProps extends StoringAllType {}
 
-//   if (storingAll) {
-//     React.useEffect(() => {
-//       sessionStorage.setItem(
-//         "🛠️ statesForWatch",
-//         JSON.stringify(statesForWatch)
-//       );
-//       sessionStorage.setItem("📌 storedStates", JSON.stringify(storedStates));
-//     }, [statesForWatch, storedStates]);
-//   } else {
-//     React.useEffect(() => {
-//       sessionStorage.setItem("📌 storedStates", JSON.stringify(storedStates));
-//     }, [storedStates]);
-//   }
+export default function SessionStor({
+  storingAll,
+}: SessionStorProps): React.ReactElement {
+  const states = useAllStoreContext();
 
-//   return null;
-// }
+  const { statesForWatch, storedStates } = React.useMemo(() => {
+    const storedStates = Object.fromEntries(
+      Object.entries(states).filter(([key]) => key.startsWith("s_"))
+    );
+    const statesForWatch = Object.fromEntries(
+      Object.entries(states).filter(([key]) => !key.startsWith("s_"))
+    );
+    return { statesForWatch, storedStates };
+  }, [states]);
+
+  if (storingAll) {
+    React.useEffect(() => {
+      sessionStorage.setItem(
+        "🛠️ statesForWatch",
+        JSON.stringify(statesForWatch)
+      );
+      sessionStorage.setItem("📌 storedStates", JSON.stringify(storedStates));
+    }, [statesForWatch, storedStates]);
+  } else {
+    React.useEffect(() => {
+      sessionStorage.setItem("📌 storedStates", JSON.stringify(storedStates));
+    }, [storedStates]);
+  }
+
+  return null;
+}

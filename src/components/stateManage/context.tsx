@@ -83,8 +83,14 @@ export default function context<Context>(
     return [getter, setter];
   }
 
+  function useAllStoreContext(): Context {
+    const [statesContext] = useStatesContext((fc) => fc);
+    return statesContext;
+  }
+
   return {
     ContextStoreProvider,
     useStoreContext,
+    useAllStoreContext,
   };
 }

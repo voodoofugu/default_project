@@ -42,6 +42,7 @@ export const loadStyles = async (
   { parent, fileNames, stylesLoaded }: InitialStatesType["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
+  console.log("loadStyles");
   if (!fileNames || fileNames.length === 0) {
     onLoad(parent, 0, stylesLoaded);
     console.log(`🚫 Your array with the parent name "${parent}" is empty`);
@@ -101,9 +102,12 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
   }, []);
 
   React.useEffect(() => {
+    console.log("styleData:", styleData);
     if (styleData.length === 0) {
       emptyStyleArray();
-    } else {
+      console.log("emptyStyleArray");
+    } else if (styleData.length > 0) {
+      console.log("loadStyleArray");
       styleData.forEach((styleObj) => {
         const prevParent = prevStyleArrayRef.current.find(
           (s) => s.parent === styleObj.parent
@@ -146,7 +150,7 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
 
       prevStyleArrayRef.current = styleData;
     }
-  }, [styleData, emptyStyleArray, handleStyleLoad]);
+  }, [styleData]);
 };
 
 export default useDynamicStyle;

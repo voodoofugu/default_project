@@ -6,7 +6,7 @@ import Main from "./pageComponents/Main";
 
 export default function App(): React.ReactElement {
   return (
-    <Provider>
+    <Provider storingAll>
       <StyleTagCore />
       <Main />
     </Provider>
