@@ -42,7 +42,6 @@ export const loadStyles = async (
   { parent, fileNames, stylesLoaded }: InitialStatesType["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
-  console.log(stylesLoaded);
   if (fileNames.length === 0) {
     onLoad(parent, 0, stylesLoaded);
     console.log(`🚫 Array with the parent "${parent}" is empty`);
@@ -69,45 +68,45 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
   const prevStyleArrayRef = React.useRef<InitialStatesType["styleData"]>([]);
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
-  const handleStyleLoad = React.useCallback(
-    (parent: string, totalFiles: number, stylesLoaded: boolean) => {
-      if (loadedFilesRef.current.loadedFiles === 0) {
-        loadedFilesRef.current = { loadedFiles: 0 };
-      }
-      if (loadedFilesRef.current.loadedFiles < totalFiles) {
-        loadedFilesRef.current.loadedFiles += 1;
-      }
-      if (
-        totalFiles === 0 ||
-        (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
-      ) {
-        setStyleData({
-          type: "STYLE_DATA",
-          payload: {
-            parent: parent,
-            stylesLoaded: true,
-          },
-        });
-      }
-    },
-    [setStyleData]
-  );
+  const handleStyleLoad = (
+    parent: string,
+    totalFiles: number,
+    stylesLoaded: boolean
+  ) => {
+    if (loadedFilesRef.current.loadedFiles === 0) {
+      loadedFilesRef.current = { loadedFiles: 0 };
+    }
+    if (loadedFilesRef.current.loadedFiles < totalFiles) {
+      loadedFilesRef.current.loadedFiles += 1;
+    }
+    if (
+      totalFiles === 0 ||
+      (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
+    ) {
+      setStyleData({
+        type: "STYLE_DATA",
+        payload: {
+          parent: parent,
+          stylesLoaded: true,
+        },
+      });
+    }
+  };
 
-  const emptyStyleArray = React.useCallback(() => {
+  const emptyStyleArray = () => {
     if (prevStyleArrayRef.current.length > 0) {
       prevStyleArrayRef.current.forEach((styleObj) => {
         clearStyles(styleObj);
       });
     }
-  }, []);
+  };
 
   React.useEffect(() => {
-    if (styleData.length === 0) {
-      emptyStyleArray();
-      return;
-    }
+    emptyStyleArray();
 
-    loadStyleArray(styleData);
+    if (styleData.length > 0) {
+      loadStyleArray(styleData);
+    }
   }, [styleData]);
 
   const loadStyleArray = (styleData: InitialStatesType["styleData"]) => {

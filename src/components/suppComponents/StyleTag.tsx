@@ -17,7 +17,6 @@ export const styleLoading = ({
   styleData: InitialStatesType["styleData"];
 }) => {
   let stylesLoaded = false;
-  console.log(styleData);
   styleData.forEach((styleObj) => {
     if (styleObj.parent === parent) {
       stylesLoaded = styleObj.stylesLoaded ?? false;
@@ -49,7 +48,7 @@ const StyleTag = ({
         fileNames: memoizedFileNames,
       },
     });
-  }, [parent, memoizedFileNames, setStyleData]);
+  }, [parent, memoizedFileNames]);
 
   React.useEffect(() => {
     return () => {
@@ -60,7 +59,7 @@ const StyleTag = ({
         },
       });
     };
-  }, [parent, setStyleData]);
+  }, [parent]);
 
   if (children) {
     return (

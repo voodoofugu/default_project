@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useStoreContext } from "../stateManage/Provider";
 
 interface RequestState {
@@ -9,12 +9,12 @@ interface RequestState {
 export default function useRequest(requestName: string, url: string) {
   const [requestData, setRequestData] =
     useStoreContext<RequestState>(requestName);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let isMounted = true;
 
-    const fetchData = async () => {
+    (async () => {
       try {
         const response = await fetch(url);
 
@@ -29,7 +29,7 @@ export default function useRequest(requestName: string, url: string) {
           setRequestData({
             type: "REQUEST_DATA",
             payload: {
-              requestName,
+              requestName: requestName,
               data: json,
               requestLoaded: true,
             },
@@ -42,7 +42,7 @@ export default function useRequest(requestName: string, url: string) {
           setRequestData({
             type: "REQUEST_DATA",
             payload: {
-              requestName,
+              requestName: requestName,
               data: "🚫",
               requestLoaded: false,
             },
@@ -50,22 +50,20 @@ export default function useRequest(requestName: string, url: string) {
           setLoading(false);
         }
       }
-    };
-
-    fetchData();
+    })();
 
     return () => {
       isMounted = false;
       setRequestData({
         type: "REQUEST_DATA",
         payload: {
-          requestName,
+          requestName: requestName,
           data: undefined,
           requestLoaded: false,
         },
       });
     };
-  }, [requestName, url, setRequestData]);
+  }, [requestName, url]);
 
   return {
     data: requestData ? requestData.data : undefined,

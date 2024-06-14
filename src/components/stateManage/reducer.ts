@@ -5,7 +5,6 @@ export interface Action {
 
 export default function reducer(state: any, action: Action): any {
   switch (action.type) {
-    // initialState ►
     case "STYLE_DATA":
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
@@ -13,12 +12,17 @@ export default function reducer(state: any, action: Action): any {
           (item: { parent: string }) => item.parent === parent
         );
 
+        let newStyleData = [...state.styleData];
+
         if ("fileNames" in action.payload) {
           // push/update
           if (existingIndex !== -1) {
-            state.styleData[existingIndex].fileNames = fileNames;
+            newStyleData[existingIndex] = {
+              ...newStyleData[existingIndex],
+              fileNames,
+            };
           } else {
-            state.styleData.push({
+            newStyleData.push({
               parent: parent,
               fileNames: fileNames,
               stylesLoaded: false,
@@ -27,14 +31,22 @@ export default function reducer(state: any, action: Action): any {
         } else if ("stylesLoaded" in action.payload) {
           // loadeding
           if (existingIndex !== -1) {
-            state.styleData[existingIndex].stylesLoaded = stylesLoaded;
+            newStyleData[existingIndex] = {
+              ...newStyleData[existingIndex],
+              stylesLoaded,
+            };
           }
         } else {
           // clear
           if (existingIndex !== -1) {
-            state.styleData.splice(existingIndex, 1);
+            newStyleData.splice(existingIndex, 1);
           }
         }
+
+        return {
+          ...state,
+          styleData: newStyleData,
+        };
       }
       return state;
 
@@ -42,24 +54,28 @@ export default function reducer(state: any, action: Action): any {
       if (action.payload) {
         const { requestName, data, requestLoaded } = action.payload;
 
-        // initial
-        if (!state[requestName]) {
-          state[requestName] = {};
-        }
+        let newRequestData = { ...state[requestName] };
 
         if (data !== undefined) {
           // update
-          state[requestName].data = data;
-          if (!("requestLoaded" in state[requestName])) {
-            state[requestName].requestLoaded = false;
+          newRequestData.data = data;
+          if (!("requestLoaded" in newRequestData)) {
+            newRequestData.requestLoaded = false;
           }
-        } else if (requestLoaded !== undefined) {
+        }
+        if (requestLoaded !== undefined) {
           // update requestLoaded
-          state[requestName].requestLoaded = requestLoaded;
+          newRequestData.requestLoaded = requestLoaded;
         } else {
           // clear
-          delete state[requestName];
+          delete newRequestData[requestName];
+          console.log("requestName", requestName);
         }
+
+        return {
+          ...state,
+          [requestName]: newRequestData,
+        };
       }
       return state;
 
@@ -69,10 +85,8 @@ export default function reducer(state: any, action: Action): any {
     case "TEXT2":
       return { ...state, text2: action.payload };
 
-    // initialState_storeSaved ►
     case "BOOL_STATE":
-      state.s_booleanState = action.payload;
-      return state;
+      return { ...state, s_booleanState: action.payload };
 
     default:
       return state;
