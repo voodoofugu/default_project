@@ -7,6 +7,8 @@ const StyleTagCore: React.FC = () => {
   const [styleData, setStyleData] =
     useStoreContext<InitialStatesType["styleData"]>("styleData");
 
+  console.log(styleData);
+
   useDynamicStyle({ styleData, setStyleData });
 
   return null;

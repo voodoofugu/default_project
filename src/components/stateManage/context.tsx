@@ -2,7 +2,7 @@ import React from "react";
 import { Action } from "./reducer";
 
 export default function context<Context>(
-  initialState: Context,
+  initialStates: Context,
   reducer: (state: Context, action: Action) => Context
 ) {
   function useStatesContextData(): {
@@ -10,7 +10,7 @@ export default function context<Context>(
     set: (value: Partial<Context>) => void;
     subscribe: (callback: () => void) => () => void;
   } {
-    const store = React.useRef(initialState);
+    const store = React.useRef(initialStates);
 
     const get = React.useCallback(() => store.current, []);
 
@@ -59,7 +59,7 @@ export default function context<Context>(
     const state = React.useSyncExternalStore(
       statesContext.subscribe,
       () => selector(statesContext.get()),
-      () => selector(initialState)
+      () => selector(initialStates)
     );
 
     const set = (value: Partial<Context> | Action) => {

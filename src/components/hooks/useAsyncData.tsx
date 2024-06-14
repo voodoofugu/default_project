@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-const useAsyncData = (data: any) => {
-  const [asyncData, setAsyncData] = useState(null);
+const useAsyncData = (data: any, defaultValue?: any) => {
+  const [asyncData, setAsyncData] = useState(defaultValue || null);
 
   useEffect(() => {
     let isMounted = true;

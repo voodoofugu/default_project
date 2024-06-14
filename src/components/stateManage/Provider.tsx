@@ -1,13 +1,13 @@
 import React from "react";
 import context from "./context";
 import initialStates from "./initialStates";
-import initialState_requests from "./initialState_requests";
+import initialStates_requests from "./initialStates_requests";
 import reducer from "./reducer";
 import SessionStor from "../suppComponents/SessionStor";
 
 const combinedInitialStates = {
   ...initialStates,
-  ...initialState_requests,
+  ...initialStates_requests,
 };
 
 export const { ContextStoreProvider, useStoreContext, useAllStoreContext } =

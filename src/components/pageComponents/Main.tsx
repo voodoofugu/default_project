@@ -17,7 +17,7 @@ export default function Main(): React.ReactElement {
         <Text2 />
       </StyleTag>
 
-      <Pokemon1 />
+      {/* <Pokemon1 /> */}
     </>
   );
 }

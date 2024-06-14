@@ -1,7 +1,6 @@
 import React from "react";
 import { InitialStatesType } from "../stateManage/initialStates";
 import textToCamelcase from "../../scripts/textToCamelcase";
-import useAsyncData from "./useAsyncData";
 
 export interface DynamicStyleArray {
   styleData: InitialStatesType["styleData"];
@@ -102,16 +101,14 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
     }
   }, []);
 
-  const asyncStyleData = useAsyncData(styleData); // Используем асинхронный хук
-
   React.useEffect(() => {
-    if (!asyncStyleData) {
+    if (styleData.length === 0) {
       emptyStyleArray();
       return;
     }
 
-    loadStyleArray(asyncStyleData);
-  }, [asyncStyleData]);
+    loadStyleArray(styleData);
+  }, [styleData]);
 
   const loadStyleArray = (styleData: InitialStatesType["styleData"]) => {
     styleData.forEach((styleObj) => {
