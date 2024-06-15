@@ -10,8 +10,10 @@ const combinedInitialStates = {
   ...initialStates_requests,
 };
 
-export const { ContextStoreProvider, useStoreContext, useAllStoreContext } =
-  context(combinedInitialStates, reducer);
+const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
+  combinedInitialStates,
+  reducer
+);
 
 interface ProviderProps {
   storingAll?: boolean;
@@ -27,4 +29,5 @@ const Provider: React.FC<ProviderProps> = ({ storingAll, children }) => {
   );
 };
 
-export default Provider;
+export { Provider, useStoreContext, useAllStoreContext };
+export default useStoreContext;

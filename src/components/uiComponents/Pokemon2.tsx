@@ -1,25 +1,23 @@
 import React from "react";
 import StyleTag from "../suppComponents/StyleTag";
-import useRequest from "../hooks/useRequest";
+import Request from "../suppComponents/Request";
 
 export default React.memo(function Pokemon2(): React.ReactElement {
-  console.log("🚀Pokemon2");
-  const { data, requestLoaded } = useRequest(
-    "pokemon2",
-    "https://pokeapi.co/api/v2/pokemon/9"
-  );
-
   return (
     <>
       <StyleTag parent="hi" fileNames={["hi"]} />
-      {requestLoaded ? (
-        <>
-          <div>{data.name}</div>
-          <img src={data.sprites.front_default} />
-        </>
-      ) : (
-        <div>Loading...</div>
-      )}
+      <Request
+        requestName="s_pokemon2"
+        url="https://pokeapi.co/api/v2/pokemon/9"
+        loadingElement={<div>Loading Pokemon...</div>}
+      >
+        {(data) => (
+          <div>
+            <h1>{data.name}</h1>
+            <img src={data.sprites.front_default} alt={data.name} />
+          </div>
+        )}
+      </Request>
     </>
   );
 });

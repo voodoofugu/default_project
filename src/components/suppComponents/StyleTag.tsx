@@ -1,6 +1,6 @@
 import React from "react";
-import { InitialStatesType } from "../stateManage/initialStates";
-import { useStoreContext } from "../stateManage/Provider";
+import { InitialStatesType } from "../stateManager/initialStates";
+import useStoreContext from "../stateManager/store";
 
 interface StyleTagProps {
   parent: InitialStatesType["parent"];

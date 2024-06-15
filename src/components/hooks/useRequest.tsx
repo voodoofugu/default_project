@@ -1,5 +1,5 @@
 import React from "react";
-import { useStoreContext } from "../stateManage/Provider";
+import useStoreContext from "../stateManager/store";
 
 interface RequestState {
   data?: any;
@@ -9,10 +9,25 @@ interface RequestState {
 export default function useRequest(requestName: string, url: string) {
   const [requestData, setRequestData] =
     useStoreContext<RequestState>(requestName);
-  const [loading, setLoading] = React.useState(true);
+
+  const storageRequestName = JSON.parse(
+    sessionStorage.getItem(`📌 storedStates`)
+  );
 
   React.useEffect(() => {
     let isMounted = true;
+
+    if (storageRequestName[requestName].url === url) {
+      setRequestData({
+        type: "REQUEST_DATA",
+        payload: {
+          requestName: requestName,
+          data: storageRequestName[requestName].data,
+          requestLoaded: storageRequestName[requestName].requestLoaded,
+        },
+      });
+      return;
+    }
 
     (async () => {
       try {
@@ -34,7 +49,6 @@ export default function useRequest(requestName: string, url: string) {
               requestLoaded: true,
             },
           });
-          setLoading(false);
         }
       } catch (error) {
         console.error(error);
@@ -47,7 +61,6 @@ export default function useRequest(requestName: string, url: string) {
               requestLoaded: false,
             },
           });
-          setLoading(false);
         }
       }
     })();
@@ -66,8 +79,7 @@ export default function useRequest(requestName: string, url: string) {
   }, [requestName, url]);
 
   return {
-    data: requestData ? requestData.data : undefined,
     requestLoaded: requestData ? requestData.requestLoaded : false,
-    loading,
+    data: requestData && requestData.data,
   };
 }

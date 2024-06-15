@@ -12,7 +12,7 @@ export default function reducer(state: any, action: Action): any {
           (item: { parent: string }) => item.parent === parent
         );
 
-        let newStyleData = [...state.styleData];
+        const newStyleData = [...state.styleData];
 
         if ("fileNames" in action.payload) {
           // push/update
@@ -54,7 +54,7 @@ export default function reducer(state: any, action: Action): any {
       if (action.payload) {
         const { requestName, data, requestLoaded } = action.payload;
 
-        let newRequestData = { ...state[requestName] };
+        const newRequestData = { ...state[requestName] };
 
         if (data !== undefined) {
           // update
@@ -78,15 +78,6 @@ export default function reducer(state: any, action: Action): any {
         };
       }
       return state;
-
-    case "TEXT1":
-      return { ...state, text1: action.payload };
-
-    case "TEXT2":
-      return { ...state, text2: action.payload };
-
-    case "BOOL_STATE":
-      return { ...state, s_booleanState: action.payload };
 
     default:
       return state;

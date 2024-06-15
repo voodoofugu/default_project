@@ -1,7 +1,7 @@
 import React from "react";
 import useDynamicStyle from "../hooks/useDynamicStyle";
-import { useStoreContext } from "../stateManage/Provider";
-import { InitialStatesType } from "../stateManage/initialStates";
+import useStoreContext from "../stateManager/store";
+import { InitialStatesType } from "../stateManager/initialStates";
 
 const StyleTagCore: React.FC = () => {
   const [styleData, setStyleData] =

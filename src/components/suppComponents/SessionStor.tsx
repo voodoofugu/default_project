@@ -1,5 +1,5 @@
 import React from "react";
-import { useAllStoreContext } from "../stateManage/Provider";
+import { useAllStoreContext } from "../stateManager/store";
 
 export interface StoringAllType {
   storingAll?: boolean;

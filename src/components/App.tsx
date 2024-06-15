@@ -1,6 +1,6 @@
 import React from "react";
 
-import Provider from "./stateManage/Provider";
+import { Provider } from "./stateManager/store";
 import StyleTagCore from "./suppComponents/StyleTagCore";
 import Main from "./pageComponents/Main";
 

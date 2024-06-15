@@ -1,5 +1,5 @@
 import React from "react";
-import { InitialStatesType } from "../stateManage/initialStates";
+import { InitialStatesType } from "../stateManager/initialStates";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
 export interface DynamicStyleArray {
