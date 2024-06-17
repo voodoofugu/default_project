@@ -1,5 +1,6 @@
 import React from "react";
 import Request from "../suppComponents/Request";
+import Image from "../suppComponents/Image";
 
 export default function Pokemon1(): React.ReactElement {
   return (
@@ -11,7 +12,12 @@ export default function Pokemon1(): React.ReactElement {
       {(data) => (
         <div>
           <h1>{data.name}</h1>
-          <img src={data.sprites.front_default} alt={data.name} />
+          <Image
+            width={96}
+            height={96}
+            src={data.sprites.front_default}
+            alt={data.name}
+          />
         </div>
       )}
     </Request>

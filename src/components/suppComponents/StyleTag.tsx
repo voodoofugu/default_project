@@ -68,7 +68,7 @@ const StyleTag = ({
           ? children
           : loadingElement
           ? loadingElement
-          : "Loading..."}
+          : null}
       </>
     );
   } else {
