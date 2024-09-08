@@ -1,18 +1,17 @@
-export interface Action {
-  type: string;
-  payload?: any;
-}
+export const actionConfig = {
+  SOME_ACTION1: { initialState: { value1: "123" } },
+  SOME_ACTION2: { initialState: { value2: false } },
 
-export default function reducer(state: any, action: Action): any {
-  switch (action.type) {
-    case "STYLE_DATA":
+  STYLE_DATA: {
+    initialState: { styleData: [] as any[] },
+    reducer(state: any, action: any) {
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
-        const existingIndex = state.styleData.findIndex(
+        const existingIndex = state.findIndex(
           (item: { parent: string }) => item.parent === parent
         );
 
-        const newStyleData = [...state.styleData];
+        const newStyleData = [...state];
 
         if ("fileNames" in action.payload) {
           // push/update
@@ -29,7 +28,7 @@ export default function reducer(state: any, action: Action): any {
             });
           }
         } else if ("stylesLoaded" in action.payload) {
-          // loadeding
+          // updating stylesLoaded
           if (existingIndex !== -1) {
             newStyleData[existingIndex] = {
               ...newStyleData[existingIndex],
@@ -43,14 +42,15 @@ export default function reducer(state: any, action: Action): any {
           }
         }
 
-        return {
-          ...state,
-          styleData: newStyleData,
-        };
+        return newStyleData;
       }
       return state;
+    },
+  },
 
-    case "REQUEST_DATA":
+  REQUEST_DATA: {
+    initialState: { s_pokemon1: { data: null as any, requestLoaded: false } },
+    reducer(state: any, action: any) {
       if (action.payload) {
         const { requestName, data, requestLoaded } = action.payload;
 
@@ -77,21 +77,8 @@ export default function reducer(state: any, action: Action): any {
           [requestName]: newRequestData,
         };
       }
-      return state;
 
-    case "SOME_ACTION":
-      {
-        if (action.payload) {
-          const { someData } = action.payload;
-          return {
-            ...state,
-            someData: someData,
-          };
-        }
-      }
       return state;
-
-    default:
-      return state;
-  }
-}
+    },
+  },
+};

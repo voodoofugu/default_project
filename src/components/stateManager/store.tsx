@@ -1,19 +1,26 @@
 import React from "react";
 import context from "./context";
-import initialStates from "./initialStates";
-import initialStates_requests from "./initialStates_requests";
-import reducer from "./reducer";
+// import initialStates from "./initialStates";
+// import initialStates_requests from "./initialStates_requests";
+// import reducer from "./reducer";
 import SessionStor from "../suppComponents/SessionStor";
+import { initialStates, reducer } from "../stateManager2/generateData";
 
-const combinedInitialStates = {
-  ...initialStates,
-  ...initialStates_requests,
-};
+// const combinedInitialStates = {
+//   ...initialStates,
+//   ...initialStates_requests,
+// };
 
+// const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
+//   combinedInitialStates,
+//   reducer
+// );
+const initialState = initialStates();
 const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
-  combinedInitialStates,
+  initialState,
   reducer
 );
+// console.log("useAllStoreContext", useAllStoreContext);
 
 interface ProviderProps {
   storingAll?: boolean;
