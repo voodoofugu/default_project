@@ -13,7 +13,7 @@ export default function SomeComponent(): React.ReactElement {
     });
   }, []);
 
-  console.log("someData", someData);
+  // console.log("someData", someData);
 
   return <div>{someData !== undefined ? someData : "Loading..."}</div>;
 }

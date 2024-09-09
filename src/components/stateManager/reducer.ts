@@ -8,11 +8,11 @@ export default function reducer(state: any, action: Action): any {
     case "STYLE_DATA":
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
-        const existingIndex = state.styleData.findIndex(
+        const existingIndex = state.findIndex(
           (item: { parent: string }) => item.parent === parent
         );
 
-        const newStyleData = [...state.styleData];
+        const newStyleData = [...state];
 
         if ("fileNames" in action.payload) {
           // push/update

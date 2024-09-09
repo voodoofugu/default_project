@@ -23,7 +23,6 @@ function initialStates() {
 
   return initialState;
 }
-console.log("initialStates", initialStates());
 
 function reducer(state: any, action: { type: string; payload?: any }): any {
   const type = action.type as keyof typeof actionConfig;

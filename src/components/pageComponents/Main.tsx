@@ -8,13 +8,11 @@ import SomeComponent from "../uiComponents/SomeComponent";
 
 export default function Main(): React.ReactElement {
   return (
-    // <StyleTag parent="main" fileNames={["outputTailwind"]} loadingElement="🔄">
-    // <Pokemon1 />
-    // <Pokemon2 />
-    // </StyleTag>
-    <>
+    <StyleTag parent="main" fileNames={["outputTailwind"]} loadingElement="🔄">
       hi
+      <Pokemon1 />
+      <Pokemon2 />
       <SomeComponent />
-    </>
+    </StyleTag>
   );
 }

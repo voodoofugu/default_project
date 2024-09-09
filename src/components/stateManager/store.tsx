@@ -20,7 +20,6 @@ const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
   initialState,
   reducer
 );
-// console.log("useAllStoreContext", useAllStoreContext);
 
 interface ProviderProps {
   storingAll?: boolean;

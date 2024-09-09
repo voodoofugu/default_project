@@ -3,15 +3,15 @@ export const actionConfig = {
   SOME_ACTION2: { initialState: { value2: false } },
 
   STYLE_DATA: {
-    initialState: { styleData: [] as any[] },
-    reducer(state: any, action: any) {
+    initialState: { styleData: [] },
+    reducer(state, action) {
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
-        const existingIndex = state.findIndex(
-          (item: { parent: string }) => item.parent === parent
+        const existingIndex = state.styleData.findIndex(
+          (item) => item.parent === parent
         );
 
-        const newStyleData = [...state];
+        const newStyleData = [...state.styleData];
 
         if ("fileNames" in action.payload) {
           // push/update
@@ -28,7 +28,7 @@ export const actionConfig = {
             });
           }
         } else if ("stylesLoaded" in action.payload) {
-          // updating stylesLoaded
+          // loadeding
           if (existingIndex !== -1) {
             newStyleData[existingIndex] = {
               ...newStyleData[existingIndex],
@@ -42,15 +42,21 @@ export const actionConfig = {
           }
         }
 
-        return newStyleData;
+        return {
+          ...state,
+          styleData: newStyleData,
+        };
       }
       return state;
     },
   },
 
   REQUEST_DATA: {
-    initialState: { s_pokemon1: { data: null as any, requestLoaded: false } },
-    reducer(state: any, action: any) {
+    initialState: {
+      s_pokemon1: { data: null, requestLoaded: false },
+      s_pokemon2: { data: null, requestLoaded: false },
+    },
+    reducer(state, action) {
       if (action.payload) {
         const { requestName, data, requestLoaded } = action.payload;
 
