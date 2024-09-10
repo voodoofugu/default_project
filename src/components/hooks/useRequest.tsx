@@ -10,9 +10,7 @@ export default function useRequest(requestName: string, url: string) {
   const [requestData, setRequestData] =
     useStoreContext<RequestState>(requestName);
 
-  const storageRequestName = JSON.parse(
-    sessionStorage.getItem(`📌 storedStates`)
-  );
+  const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
 
   React.useEffect(() => {
     let isMounted = true;

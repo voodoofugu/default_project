@@ -1,9 +1,18 @@
-export const actionConfig = {
-  SOME_ACTION1: { initialState: { value1: "123" } },
-  SOME_ACTION2: { initialState: { value2: false } },
+export const initialStates = {
+  value1: "123",
+  value2: false,
+  styleData: [],
+  pokemon1_s: { data: null, requestLoaded: false },
+  pokemon2_s: { data: null, requestLoaded: false },
+
+  value2_l: false,
+};
+
+export const actions = {
+  SOME_ACTION1: {},
+  SOME_ACTION2: {},
 
   STYLE_DATA: {
-    initialState: { styleData: [] },
     reducer(state, action) {
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
@@ -52,10 +61,6 @@ export const actionConfig = {
   },
 
   REQUEST_DATA: {
-    initialState: {
-      s_pokemon1: { data: null, requestLoaded: false },
-      s_pokemon2: { data: null, requestLoaded: false },
-    },
     reducer(state, action) {
       if (action.payload) {
         const { requestName, data, requestLoaded } = action.payload;

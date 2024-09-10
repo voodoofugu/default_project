@@ -3,7 +3,7 @@ import context from "./context";
 // import initialStates from "./initialStates";
 // import initialStates_requests from "./initialStates_requests";
 // import reducer from "./reducer";
-import SessionStor from "../suppComponents/SessionStor";
+import Storage from "../suppComponents/Storage";
 import { initialStates, reducer } from "../stateManager2/generateData";
 
 // const combinedInitialStates = {
@@ -15,25 +15,24 @@ import { initialStates, reducer } from "../stateManager2/generateData";
 //   combinedInitialStates,
 //   reducer
 // );
-const initialState = initialStates();
-const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
-  initialState,
+const { useNexus, useNexusAll, NexusContextProvider } = context(
+  initialStates,
   reducer
 );
 
 interface ProviderProps {
-  storingAll?: boolean;
+  watch?: boolean;
   children: React.ReactNode;
 }
 
-const Provider: React.FC<ProviderProps> = ({ storingAll, children }) => {
+const NexusProvider: React.FC<ProviderProps> = ({ watch, children }) => {
   return (
-    <ContextStoreProvider>
-      <SessionStor storingAll={storingAll} />
+    <NexusContextProvider>
+      <Storage watch={watch} />
       {children}
-    </ContextStoreProvider>
+    </NexusContextProvider>
   );
 };
 
-export { Provider, useStoreContext, useAllStoreContext };
-export default useStoreContext;
+export { useNexus, useNexusAll, NexusProvider };
+export default useNexus;

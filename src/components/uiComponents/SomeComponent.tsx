@@ -1,8 +1,8 @@
 import React from "react";
-import useStoreContext from "../stateManager/store";
+import useNexus from "../stateManager/store";
 
 export default function SomeComponent(): React.ReactElement {
-  const [someData, setSomeData] = useStoreContext<any>("value1");
+  const [someData, setSomeData] = useNexus<any>("value1");
 
   React.useEffect(() => {
     setSomeData({

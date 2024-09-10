@@ -5,7 +5,7 @@ import Image from "../suppComponents/Image";
 export default function Pokemon1(): React.ReactElement {
   return (
     <Request
-      requestName="s_pokemon1"
+      requestName="pokemon1_s"
       url="https://pokeapi.co/api/v2/pokemon/18"
       loadingElement={<div>Loading Pokemon...</div>}
     >

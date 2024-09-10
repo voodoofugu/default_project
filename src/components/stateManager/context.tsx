@@ -38,7 +38,7 @@ export default function context<Context>(
   const StatesContext =
     React.createContext<UseStatesContextDataReturnType | null>(null);
 
-  function ContextStoreProvider({
+  function NexusContextProvider({
     children,
   }: Readonly<{ children: React.ReactNode }>) {
     return (
@@ -74,7 +74,7 @@ export default function context<Context>(
     return [state, set];
   }
 
-  function useStoreContext<SelectorOutput>(
+  function useNexus<SelectorOutput>(
     fieldName: string
   ): [SelectorOutput, (value: any) => void] {
     const [getter, setter] = useStatesContext(
@@ -83,14 +83,14 @@ export default function context<Context>(
     return [getter, setter];
   }
 
-  function useAllStoreContext(): Context {
+  function useNexusAll(): Context {
     const [statesContext] = useStatesContext((fc) => fc);
     return statesContext;
   }
 
   return {
-    ContextStoreProvider,
-    useStoreContext,
-    useAllStoreContext,
+    NexusContextProvider,
+    useNexus,
+    useNexusAll,
   };
 }

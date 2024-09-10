@@ -7,7 +7,7 @@ export default React.memo(function Pokemon2(): React.ReactElement {
     <>
       <StyleTag parent="hi" fileNames={["hi"]} />
       <Request
-        requestName="s_pokemon2"
+        requestName="pokemon2_s"
         url="https://pokeapi.co/api/v2/pokemon/9"
         loadingElement={<div>Loading Pokemon...</div>}
       >
