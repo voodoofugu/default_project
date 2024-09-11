@@ -11,6 +11,9 @@ export default function Storage({
   watch,
 }: SessionStorProps): React.ReactElement {
   const states = useNexusAll();
+  const isEmpty = (obj: Record<string, any>): boolean => {
+    return Object.keys(obj).length === 0;
+  };
 
   const { statesForWatch, localStates, sessionStates } = React.useMemo(() => {
     const localStates = Object.fromEntries(
@@ -27,18 +30,16 @@ export default function Storage({
     return { statesForWatch, localStates, sessionStates };
   }, [states]);
 
-  if (watch) {
-    React.useEffect(() => {
+  React.useEffect(() => {
+    !isEmpty(localStates) &&
       localStorage.setItem("📌", JSON.stringify(localStates));
+    !isEmpty(sessionStates) &&
       sessionStorage.setItem("📌", JSON.stringify(sessionStates));
-      sessionStorage.setItem("👀", JSON.stringify(statesForWatch));
-    }, [statesForWatch, sessionStates]);
-  } else {
-    React.useEffect(() => {
-      localStorage.setItem("📌", JSON.stringify(localStates));
-      sessionStorage.setItem("📌", JSON.stringify(sessionStates));
-    }, [sessionStates]);
-  }
+
+    if (watch) {
+      sessionStorage.setItem("👁", JSON.stringify(statesForWatch));
+    }
+  }, [localStates, sessionStates, statesForWatch, watch]);
 
   return null;
 }

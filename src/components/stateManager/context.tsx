@@ -89,8 +89,8 @@ export default function context<Context>(
   }
 
   return {
-    NexusContextProvider,
     useNexus,
     useNexusAll,
+    NexusContextProvider,
   };
 }

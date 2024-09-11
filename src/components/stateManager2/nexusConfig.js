@@ -5,7 +5,7 @@ export const initialStates = {
   pokemon1_s: { data: null, requestLoaded: false },
   pokemon2_s: { data: null, requestLoaded: false },
 
-  value2_l: false,
+  // value2_l: false,
 };
 
 export const actions = {
