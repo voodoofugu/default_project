@@ -1,20 +1,6 @@
 import React from "react";
 import context from "./context";
-// import initialStates from "./initialStates";
-// import initialStates_requests from "./initialStates_requests";
-// import reducer from "./reducer";
 import Storage from "../suppComponents/Storage";
-// import { initialStates, reducer } from "../stateManager2/generateData";
-
-// const combinedInitialStates = {
-//   ...initialStates,
-//   ...initialStates_requests,
-// };
-
-// const { ContextStoreProvider, useStoreContext, useAllStoreContext } = context(
-//   combinedInitialStates,
-//   reducer
-// );
 
 interface Config {
   initialStates: Record<string, any>;
@@ -26,14 +12,20 @@ interface Config {
   >;
 }
 
+let initialStates: Config["initialStates"] = {};
+let actions: Config["actions"] = {};
+
+// Функция конфигурации
 function configureNexus(config: Config): void {
   initialStates = config.initialStates;
   actions = config.actions;
 }
-let initialStates: Config["initialStates"] = {};
-let actions: Config["actions"] = {};
 
-function reducer(state: any, action: { type: string; payload?: any }): any {
+// Редьюсер, использующий действия из конфигурации
+function reducerNexus(
+  state: any,
+  action: { type: string; payload?: any }
+): any {
   const type = action.type as keyof typeof actions;
   const payload = action.payload;
 
@@ -59,9 +51,10 @@ function reducer(state: any, action: { type: string; payload?: any }): any {
   return state;
 }
 
+// Создаём контекст, используя начальные состояния и редьюсер
 const { useNexus, useNexusAll, NexusContextProvider } = context(
   initialStates,
-  reducer
+  reducerNexus
 );
 
 interface ProviderProps {
@@ -69,6 +62,7 @@ interface ProviderProps {
   children: React.ReactNode;
 }
 
+// NexusProvider принимает конфигурацию состояний и редьюсера
 const NexusProvider: React.FC<ProviderProps> = ({ watch, children }) => {
   return (
     <NexusContextProvider>
@@ -78,5 +72,6 @@ const NexusProvider: React.FC<ProviderProps> = ({ watch, children }) => {
   );
 };
 
+// Экспортируем хуки и провайдер
 export { useNexus, useNexusAll, NexusProvider, configureNexus };
 export default useNexus;

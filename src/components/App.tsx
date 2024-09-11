@@ -4,11 +4,11 @@ import StyleTagCore from "./suppComponents/StyleTagCore";
 import Main from "./pageComponents/Main";
 
 import {
+  useNexusAll,
   NexusProvider,
   configureNexus,
-  useNexusAll,
 } from "./stateManager/store";
-import { initialStates, actions } from "./stateManager2/nexusConfig";
+import { initialStates, actions } from "./stateManager/nexusConfig";
 configureNexus({ initialStates, actions });
 
 export default function App(): React.ReactElement {
