@@ -1,6 +1,6 @@
 import React from "react";
 import { InitialStatesType } from "../stateManager/initialStates";
-import useStoreContext from "../stateManager/store";
+import useNexus from "../stateManager/store";
 
 interface StyleTagProps {
   parent: InitialStatesType["parent"];
@@ -33,7 +33,7 @@ const StyleTag = ({
   loadingElement,
 }: StyleTagProps) => {
   const [styleData, setStyleData] =
-    useStoreContext<InitialStatesType["styleData"]>("styleData");
+    useNexus<InitialStatesType["styleData"]>("styleData");
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,

@@ -1,4 +1,4 @@
-import { initialStates, actions } from "./nexusConfig";
+import { initialStates, actions } from "../../../nexusConfig";
 
 function reducer(state: any, action: { type: string; payload?: any }): any {
   const type = action.type as keyof typeof actions;

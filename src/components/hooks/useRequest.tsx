@@ -1,5 +1,5 @@
 import React from "react";
-import useStoreContext from "../stateManager/store";
+import useNexus from "../stateManager/store";
 
 interface RequestState {
   data?: any;
@@ -7,8 +7,7 @@ interface RequestState {
 }
 
 export default function useRequest(requestName: string, url: string) {
-  const [requestData, setRequestData] =
-    useStoreContext<RequestState>(requestName);
+  const [requestData, setRequestData] = useNexus<RequestState>(requestName);
 
   const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
 

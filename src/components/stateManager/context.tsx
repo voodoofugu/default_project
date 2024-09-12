@@ -53,7 +53,7 @@ export default function context<Context>(
   ): [SelectorOutput, (value: Partial<Context> | Action) => void] {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
-      throw new Error("Store not found");
+      console.error(`NexusContextProvider not found 👺`);
     }
 
     const state = React.useSyncExternalStore(
@@ -75,11 +75,16 @@ export default function context<Context>(
   }
 
   function useNexus<SelectorOutput>(
-    fieldName: string
-  ): [SelectorOutput, (value: any) => void] {
-    const [getter, setter] = useStatesContext(
-      (fc) => (fc as Record<string, SelectorOutput>)[fieldName]
-    );
+    stateName: string
+  ): [SelectorOutput | undefined, (value: any) => void] {
+    const [getter, setter] = useStatesContext((fc) => {
+      if (typeof fc !== "object" || fc === null || !(stateName in fc)) {
+        console.error(`State "${stateName}" not found 👺`);
+        return undefined as SelectorOutput;
+      }
+      return (fc as Record<string, SelectorOutput>)[stateName];
+    });
+
     return [getter, setter];
   }
 

@@ -12,13 +12,32 @@ interface Config {
   >;
 }
 
-let initialStates: Config["initialStates"] = {};
-let actions: Config["actions"] = {};
+// Значения по умолчанию на случай отсутствия nexusConfig
+let initialStatesLocal: Config["initialStates"] = {};
+let actionsLocal: Config["actions"] = {};
+let nexusConfig;
 
-// Функция конфигурации
-function configureNexus(config: Config): void {
-  initialStates = config.initialStates;
-  actions = config.actions;
+// Проверяем, доступен ли объект process (если да, значит код выполняется в Node.js)
+if (typeof process !== "undefined" && process?.cwd) {
+  // Серверное окружение (Node.js)
+  try {
+    nexusConfig = require(require.resolve("nexusConfig", {
+      paths: [process.cwd()],
+    }));
+    initialStatesLocal = nexusConfig.initialStates || {};
+    actionsLocal = nexusConfig.actions || {};
+  } catch (e) {
+    if (e.code === "MODULE_NOT_FOUND") {
+      console.warn(
+        "nexusConfig не найден, используются значения по умолчанию."
+      );
+    } else {
+      throw e; // Если ошибка не связана с отсутствием модуля, пробрасываем её
+    }
+  }
+} else {
+  // Клиентское окружение (браузер)
+  console.warn("Запуск в браузере, nexusConfig не загружен.");
 }
 
 // Редьюсер, использующий действия из конфигурации
@@ -26,12 +45,11 @@ function reducerNexus(
   state: any,
   action: { type: string; payload?: any }
 ): any {
-  const type = action.type as keyof typeof actions;
+  const type = action.type as keyof typeof actionsLocal;
   const payload = action.payload;
 
-  if (actions[type]) {
-    const config = actions[type] as {
-      initialState: any;
+  if (actionsLocal[type]) {
+    const config = actionsLocal[type] as {
       reducer?: (state: any, action: any) => any;
     };
 
@@ -53,7 +71,7 @@ function reducerNexus(
 
 // Создаём контекст, используя начальные состояния и редьюсер
 const { useNexus, useNexusAll, NexusContextProvider } = context(
-  initialStates,
+  initialStatesLocal,
   reducerNexus
 );
 
@@ -73,5 +91,5 @@ const NexusProvider: React.FC<ProviderProps> = ({ watch, children }) => {
 };
 
 // Экспортируем хуки и провайдер
-export { useNexus, useNexusAll, NexusProvider, configureNexus };
+export { useNexus, useNexusAll, NexusProvider };
 export default useNexus;

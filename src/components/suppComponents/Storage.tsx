@@ -16,6 +16,9 @@ export default function Storage({
   };
 
   const { statesForWatch, localStates, sessionStates } = React.useMemo(() => {
+    if (!states) {
+      return { statesForWatch: {}, localStates: {}, sessionStates: {} };
+    }
     const localStates = Object.fromEntries(
       Object.entries(states).filter(([key]) => key.endsWith("_l"))
     );

@@ -1,8 +1,8 @@
 import React from "react";
-import useNexus from "../stateManager/store";
+import useNexus, { useNexusAll } from "../stateManager/store";
 
 export default function SomeComponent(): React.ReactElement {
-  const [someData, setSomeData] = useNexus<any>("value1");
+  // const [someData, setSomeData] = useNexus<any>("value1");
 
   // React.useEffect(() => {
   //   setSomeData({
@@ -13,7 +13,8 @@ export default function SomeComponent(): React.ReactElement {
   //   });
   // }, []);
 
-  console.log("someData", someData);
+  // console.log("someData", someData);
+  console.log("useNexusAll", useNexusAll());
 
-  return <div>{someData !== undefined ? someData : "Loading..."}</div>;
+  return <div></div>;
 }

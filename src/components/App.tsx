@@ -3,17 +3,9 @@ import React from "react";
 import StyleTagCore from "./suppComponents/StyleTagCore";
 import Main from "./pageComponents/Main";
 
-import {
-  useNexusAll,
-  NexusProvider,
-  configureNexus,
-} from "./stateManager/store";
-import { initialStates, actions } from "./stateManager/nexusConfig";
-configureNexus({ initialStates, actions });
+import { useNexusAll, NexusProvider } from "./stateManager/store";
 
 export default function App(): React.ReactElement {
-  // console.log("useNexusAll", useNexusAll());
-
   return (
     <NexusProvider watch>
       {/* <StyleTagCore /> */}
