@@ -15,29 +15,17 @@ interface Config {
 // Значения по умолчанию на случай отсутствия nexusConfig
 let initialStatesLocal: Config["initialStates"] = {};
 let actionsLocal: Config["actions"] = {};
-let nexusConfig;
 
-// Проверяем, доступен ли объект process (если да, значит код выполняется в Node.js)
-if (typeof process !== "undefined" && process?.cwd) {
-  // Серверное окружение (Node.js)
-  try {
-    nexusConfig = require(require.resolve("nexusConfig", {
-      paths: [process.cwd()],
-    }));
-    initialStatesLocal = nexusConfig.initialStates || {};
-    actionsLocal = nexusConfig.actions || {};
-  } catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-      console.warn(
-        "nexusConfig не найден, используются значения по умолчанию."
-      );
-    } else {
-      throw e; // Если ошибка не связана с отсутствием модуля, пробрасываем её
-    }
+try {
+  const nexusConfig = require("../../../nexusConfig");
+  initialStatesLocal = nexusConfig.initialStates || {};
+  actionsLocal = nexusConfig.actions || {};
+} catch (e) {
+  if (e.code === "MODULE_NOT_FOUND") {
+    console.warn("🕵️‍♂️ nexusConfig not found.");
+  } else {
+    throw e;
   }
-} else {
-  // Клиентское окружение (браузер)
-  console.warn("Запуск в браузере, nexusConfig не загружен.");
 }
 
 // Редьюсер, использующий действия из конфигурации
