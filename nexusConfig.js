@@ -10,7 +10,14 @@ export const initialStates = {
 
 export const actions = {
   SOME_ACTION1: {},
-  SOME_ACTION2: {},
+  SOME_ACTION2: {
+    reducer(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
 
   STYLE_DATA: {
     reducer(state, action) {
