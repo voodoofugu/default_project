@@ -1,6 +1,8 @@
 export const initialStates = {
-  value1: "123",
-  value2: false,
+  value1: "1",
+  value2: "2",
+  value3: "3",
+  value4: "4",
   styleData: [],
   pokemon1_s: { data: null, requestLoaded: false },
   pokemon2_s: { data: null, requestLoaded: false },
@@ -97,6 +99,24 @@ export const actions = {
       }
 
       return state;
+    },
+  },
+
+  UPDATE_INPUT1: {
+    reducer(state, action) {
+      return {
+        ...state,
+        value1: action.payload,
+      };
+    },
+  },
+
+  UPDATE_INPUT2: {
+    reducer(state, action) {
+      return {
+        ...state,
+        value2: action.payload,
+      };
     },
   },
 };
