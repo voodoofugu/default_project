@@ -1,5 +1,9 @@
 import React from "react";
-import { Action } from "./reducer";
+
+type Action = {
+  type: string;
+  payload?: any;
+};
 
 export default function context<Context>(
   initialStates: Context,
@@ -48,21 +52,52 @@ export default function context<Context>(
     );
   }
 
-  function useStatesContext<SelectorOutput>(
-    selector: (store: Context) => SelectorOutput
-  ): [SelectorOutput, (value: Partial<Context> | Action) => void] {
+  // Хук для получения состояния по ключу
+  // Перегрузка для возвращаемого типа в зависимости от входного параметра
+  function useGetNexus(stateName: string): any;
+  function useGetNexus<SelectorOutput>(
+    stateName: string
+  ): SelectorOutput | undefined;
+
+  function useGetNexus<SelectorOutput>(
+    stateName: string
+  ): SelectorOutput | undefined {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
       console.error(`NexusContextProvider not found 👺`);
+      return undefined;
     }
 
-    const state = React.useSyncExternalStore(
-      statesContext.subscribe,
-      () => selector(statesContext.get()),
-      () => selector(initialStates)
-    );
+    const getState = React.useCallback(() => {
+      const state = statesContext.get();
+      if (
+        typeof state !== "object" ||
+        state === null ||
+        !(stateName in state)
+      ) {
+        console.error(`State "${stateName}" not found 👺`);
+        return undefined;
+      }
+      return (state as Record<string, SelectorOutput>)[stateName];
+    }, [stateName, statesContext]);
 
-    const set = (value: Partial<Context> | Action) => {
+    // Подписка на изменения состояния по ключу
+    return React.useSyncExternalStore(
+      statesContext.subscribe,
+      getState,
+      () => getState() // Возвращаем текущее значение при инициализации
+    );
+  }
+
+  // Хук для обновления состояния по ключу или dispatch action
+  function useSetNexus(): (value: Partial<Context> | Action) => void {
+    const statesContext = React.useContext(StatesContext);
+    if (!statesContext) {
+      console.error(`NexusContextProvider not found 👺`);
+      return () => {}; // Ничего не делаем, если контекст не найден
+    }
+
+    return (value: Partial<Context> | Action) => {
       if ("type" in value) {
         const newState = reducer(statesContext.get(), value as Action);
         statesContext.set(newState);
@@ -70,31 +105,26 @@ export default function context<Context>(
         statesContext.set(value as Partial<Context>);
       }
     };
-
-    return [state, set];
   }
 
-  function useNexus<SelectorOutput>(
-    stateName: string
-  ): [SelectorOutput | undefined, (value: any) => void] {
-    const [getter, setter] = useStatesContext((fc) => {
-      if (typeof fc !== "object" || fc === null || !(stateName in fc)) {
-        console.error(`State "${stateName}" not found 👺`);
-        return undefined as SelectorOutput;
-      }
-      return (fc as Record<string, SelectorOutput>)[stateName];
-    });
-
-    return [getter, setter];
-  }
-
+  // Для получения всего состояния
   function useNexusAll(): Context {
-    const [statesContext] = useStatesContext((fc) => fc);
-    return statesContext;
+    const statesContext = React.useContext(StatesContext);
+    if (!statesContext) {
+      console.error(`NexusContextProvider not found 👺`);
+      return initialStates; // Возвращаем изначальное состояние, если провайдер не найден
+    }
+
+    return React.useSyncExternalStore(
+      statesContext.subscribe,
+      statesContext.get,
+      () => initialStates
+    );
   }
 
   return {
-    useNexus,
+    useGetNexus,
+    useSetNexus,
     useNexusAll,
     NexusContextProvider,
   };

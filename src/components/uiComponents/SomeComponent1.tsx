@@ -1,11 +1,12 @@
 import React from "react";
-import useNexus from "../stateManager/store";
+import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 export default function SomeComponent1(): React.ReactElement {
-  const [value1, setInputValue1] = useNexus<string>("value1");
+  const value1 = useGetNexus("value1");
+  const setNexus = useSetNexus();
 
   const handleChange1 = (e: any) => {
-    setInputValue1({
+    setNexus({
       type: "UPDATE_INPUT1",
       payload: e.target.value,
     });

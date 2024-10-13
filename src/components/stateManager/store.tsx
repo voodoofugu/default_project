@@ -42,10 +42,7 @@ function reducerNexus(
     };
 
     if (config.reducer) {
-      return {
-        ...state,
-        ...config.reducer(state, action),
-      };
+      return config.reducer(state, action);
     } else {
       return {
         ...state,
@@ -58,7 +55,7 @@ function reducerNexus(
 }
 
 // Создаём контекст, используя начальные состояния и редьюсер
-const { useNexus, useNexusAll, NexusContextProvider } = context(
+const { useGetNexus, useSetNexus, useNexusAll, NexusContextProvider } = context(
   initialStatesLocal,
   reducerNexus
 );
@@ -79,5 +76,4 @@ const NexusProvider: React.FC<ProviderProps> = ({ watch, children }) => {
 };
 
 // Экспортируем хуки и провайдер
-export { useNexus, useNexusAll, NexusProvider };
-export default useNexus;
+export { useGetNexus, useSetNexus, useNexusAll, NexusProvider };

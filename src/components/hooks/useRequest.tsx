@@ -1,5 +1,5 @@
 import React from "react";
-import useNexus from "../stateManager/store";
+import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 interface RequestState {
   data?: any;
@@ -7,15 +7,17 @@ interface RequestState {
 }
 
 export default function useRequest(requestName: string, url: string) {
-  const [requestData, setRequestData] = useNexus<RequestState>(requestName);
+  const requestData = useGetNexus<RequestState>(requestName);
 
   const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
+
+  const setNexus = useSetNexus();
 
   React.useEffect(() => {
     let isMounted = true;
 
     if (storageRequestName[requestName].url === url) {
-      setRequestData({
+      setNexus({
         type: "REQUEST_DATA",
         payload: {
           requestName: requestName,
@@ -38,7 +40,7 @@ export default function useRequest(requestName: string, url: string) {
 
         const json = await response.json();
         if (isMounted) {
-          setRequestData({
+          setNexus({
             type: "REQUEST_DATA",
             payload: {
               requestName: requestName,
@@ -50,7 +52,7 @@ export default function useRequest(requestName: string, url: string) {
       } catch (error) {
         console.error(error);
         if (isMounted) {
-          setRequestData({
+          setNexus({
             type: "REQUEST_DATA",
             payload: {
               requestName: requestName,
@@ -64,7 +66,7 @@ export default function useRequest(requestName: string, url: string) {
 
     return () => {
       isMounted = false;
-      setRequestData({
+      setNexus({
         type: "REQUEST_DATA",
         payload: {
           requestName: requestName,

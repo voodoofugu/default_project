@@ -1,11 +1,11 @@
 import React from "react";
 import useDynamicStyle from "../hooks/useDynamicStyle";
-import useNexus from "../stateManager/store";
 import { InitialStatesType } from "../stateManager/initialStates";
+import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 const StyleTagCore: React.FC = () => {
-  const [styleData, setStyleData] =
-    useNexus<InitialStatesType["styleData"]>("styleData");
+  const styleData = useGetNexus<InitialStatesType["styleData"]>("styleData");
+  const setStyleData = useSetNexus;
 
   useDynamicStyle({ styleData, setStyleData });
 

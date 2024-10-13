@@ -1,6 +1,6 @@
 import React from "react";
 import { InitialStatesType } from "../stateManager/initialStates";
-import useNexus from "../stateManager/store";
+import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 interface StyleTagProps {
   parent: InitialStatesType["parent"];
@@ -32,16 +32,17 @@ const StyleTag = ({
   children,
   loadingElement,
 }: StyleTagProps) => {
-  const [styleData, setStyleData] =
-    useNexus<InitialStatesType["styleData"]>("styleData");
+  const styleData = useGetNexus<InitialStatesType["styleData"]>("styleData");
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,
     [fileNames.join(",")]
   );
 
+  const setNexus = useSetNexus();
+
   React.useEffect(() => {
-    setStyleData({
+    setNexus({
       type: "STYLE_DATA",
       payload: {
         parent: parent,
@@ -52,7 +53,7 @@ const StyleTag = ({
 
   React.useEffect(() => {
     return () => {
-      setStyleData({
+      setNexus({
         type: "STYLE_DATA",
         payload: {
           parent: parent,
