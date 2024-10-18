@@ -32,7 +32,7 @@ const StyleTag = ({
   children,
   loadingElement,
 }: StyleTagProps) => {
-  const styleData = useGetNexus<InitialStatesType["styleData"]>("styleData");
+  const styleData = useGetNexus("styleData");
 
   const memoizedFileNames = React.useMemo(
     () => fileNames,

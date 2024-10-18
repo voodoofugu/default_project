@@ -4,7 +4,7 @@ import { InitialStatesType } from "../stateManager/initialStates";
 import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 const StyleTagCore: React.FC = () => {
-  const styleData = useGetNexus<InitialStatesType["styleData"]>("styleData");
+  const styleData = useGetNexus("styleData");
   const setStyleData = useSetNexus;
 
   useDynamicStyle({ styleData, setStyleData });

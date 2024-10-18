@@ -9,7 +9,7 @@ interface SessionStorProps extends watchType {}
 
 export default function Storage({
   watch,
-}: SessionStorProps): React.ReactElement {
+}: SessionStorProps): React.ReactElement | null {
   const states = useNexusAll();
   const isEmpty = (obj: Record<string, any>): boolean => {
     return Object.keys(obj).length === 0;

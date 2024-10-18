@@ -7,7 +7,7 @@ interface RequestState {
 }
 
 export default function useRequest(requestName: string, url: string) {
-  const requestData = useGetNexus<RequestState>(requestName);
+  const requestData = useGetNexus(requestName);
 
   const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
 
