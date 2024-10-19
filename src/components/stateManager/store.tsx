@@ -1,77 +1,25 @@
 import React, { createContext, useContext } from "react";
-import context from "./context";
+import context, { ActionType } from "./context";
 import Storage from "../suppComponents/Storage";
 
-interface Config {
-  initialStates: Record<string, any>;
-  actions: Record<
-    string,
-    {
-      reducer?: (state: any, action: any) => any;
-    }
-  >;
+// Обобщенный тип для редьюсера
+interface ActionTypeLocal<StatesType = Record<string, unknown>> {
+  reducer?: (state: StatesType, action: ActionType) => StatesType;
 }
 
-// Редьюсер, использующий действия из конфигурации
-function createReducer(actions: Config["actions"]) {
-  return function reducerNexus(
-    state: any,
-    action: { type: string; payload?: any }
-  ): any {
-    const type = action.type as keyof typeof actions;
-    const payload = action.payload;
+type ActionsMap<StatesType = Record<string, unknown>> = Record<
+  string,
+  ActionTypeLocal<StatesType>
+>;
 
-    if (actions[type]) {
-      const config = actions[type] as {
-        reducer?: (state: any, action: any) => any;
-      };
-
-      if (config.reducer) {
-        return config.reducer(state, action);
-      } else {
-        return {
-          ...state,
-          ...payload,
-        };
-      }
-    }
-
-    return state;
-  };
+// Используйте ActionTypeLocal в Config
+interface Config<StatesType = Record<string, unknown>> {
+  initialStates: StatesType;
+  actions: ActionsMap<StatesType>;
 }
 
 // Создаём контекст, используя динамические начальные состояния и редьюсер
 const NexusContext = createContext<ReturnType<typeof context> | null>(null);
-
-interface ProviderProps {
-  initialStates: Config["initialStates"];
-  actions: Config["actions"];
-  watch?: boolean;
-  children: React.ReactNode;
-}
-
-// NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider: React.FC<ProviderProps> = ({
-  initialStates,
-  actions,
-  watch,
-  children,
-}) => {
-  // Создаём редьюсер на основе переданных действий
-  const reducer = createReducer(actions);
-
-  // Создаём динамический контекст с помощью вашей функции context
-  const nexusContext = context(initialStates, reducer);
-
-  return (
-    <NexusContext.Provider value={nexusContext}>
-      <nexusContext.NexusContextProvider>
-        <Storage watch={watch} />
-        {children}
-      </nexusContext.NexusContextProvider>
-    </NexusContext.Provider>
-  );
-};
 
 // Хуки для работы с состоянием
 const useGetNexus = (stateName: string) => {
@@ -98,5 +46,64 @@ const useNexusAll = () => {
   return ctx.useNexusAll();
 };
 
+// работа с Provider
+interface ProviderProps<StatesType> {
+  initialStates: StatesType;
+  actions: Config<StatesType>["actions"];
+  watch?: boolean;
+  children: React.ReactNode;
+}
+
+// NexusProvider принимает конфигурацию состояний и редьюсера
+const NexusProvider = <StatesType,>({
+  initialStates,
+  actions,
+  watch,
+  children,
+}: ProviderProps<StatesType>) => {
+  // Создаём редьюсер на основе переданных действий
+  const reducer = createReducer<StatesType>(actions);
+
+  // Создаём динамический контекст с помощью вашей функции context
+  const NexusContextLocal = context(initialStates, reducer);
+
+  return (
+    <NexusContext.Provider value={NexusContextLocal}>
+      <NexusContextLocal.NexusContextProvider>
+        <Storage watch={watch} />
+        {children}
+      </NexusContextLocal.NexusContextProvider>
+    </NexusContext.Provider>
+  );
+};
+
+// Функция createReducer с дженериком State
+function createReducer<StatesType = Record<string, unknown>>(
+  actions: Config<StatesType>["actions"]
+) {
+  return function reducerNexus(
+    state: StatesType,
+    action: { type: string; payload?: Partial<StatesType> }
+  ): StatesType {
+    const type = action.type as keyof typeof actions;
+    const payload = action.payload;
+
+    if (actions[type]) {
+      const config = actions[type];
+
+      if (config.reducer) {
+        return config.reducer(state, action);
+      } else {
+        return {
+          ...state,
+          ...payload,
+        } as StatesType;
+      }
+    }
+
+    return state;
+  };
+}
+
 // Экспортируем хуки и провайдер
-export { useGetNexus, useSetNexus, useNexusAll, NexusProvider };
+export { useGetNexus, useSetNexus, useNexusAll, NexusProvider, ActionsMap };

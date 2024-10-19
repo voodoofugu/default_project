@@ -5,13 +5,11 @@ export interface watchType {
   watch?: boolean;
 }
 
-interface SessionStorProps extends watchType {}
-
 export default function Storage({
   watch,
-}: SessionStorProps): React.ReactElement | null {
+}: watchType): React.ReactElement | null {
   const states = useNexusAll();
-  const isEmpty = (obj: Record<string, any>): boolean => {
+  const isEmpty = (obj: Record<string, unknown>): boolean => {
     return Object.keys(obj).length === 0;
   };
 
@@ -34,10 +32,13 @@ export default function Storage({
   }, [states]);
 
   React.useEffect(() => {
-    !isEmpty(localStates) &&
+    if (!isEmpty(localStates)) {
       localStorage.setItem("📌", JSON.stringify(localStates));
-    !isEmpty(sessionStates) &&
+    }
+
+    if (!isEmpty(sessionStates)) {
       sessionStorage.setItem("📌", JSON.stringify(sessionStates));
+    }
 
     if (watch) {
       sessionStorage.setItem("👁", JSON.stringify(statesForWatch));

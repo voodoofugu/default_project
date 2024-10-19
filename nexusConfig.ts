@@ -1,3 +1,5 @@
+import { ActionsMap } from "./src/components/stateManager/store";
+
 // Определение интерфейсов для состояния и действий
 interface StyleData {
   parent: string;
@@ -10,7 +12,7 @@ interface PokemonState {
   requestLoaded: boolean;
 }
 
-export interface InitialStates {
+export interface InitialStatesType {
   value1: number;
   value2: number;
   value3: string;
@@ -21,20 +23,8 @@ export interface InitialStates {
   value2_l: boolean;
 }
 
-// Определяем типы ключей состояния
-type RequestName = keyof InitialStates;
-
-interface Action {
-  type: string;
-  payload?: any; // Измените тип на более конкретный, если знаете, какие данные будут
-}
-
-interface ActionConfig {
-  reducer?: (state: InitialStates, action: Action) => InitialStates;
-}
-
 // Начальное состояние
-export const initialStates: InitialStates = {
+export const initialStates: InitialStatesType = {
   value1: 1,
   value2: 2,
   value3: "3",
@@ -46,7 +36,7 @@ export const initialStates: InitialStates = {
 };
 
 // Действия
-export const actions: Record<string, ActionConfig> = {
+export const actions: ActionsMap<InitialStatesType> = {
   SOME_ACTION1: {},
   SOME_ACTION2: {
     reducer(state, action) {
@@ -111,7 +101,8 @@ export const actions: Record<string, ActionConfig> = {
         const { requestName, data, requestLoaded } = action.payload;
 
         // Проверяем, что state[requestName] — это объект
-        const currentState = state[requestName as RequestName] || {};
+        const currentState =
+          state[requestName as keyof InitialStatesType] || {};
         const newRequestData: { data?: any; requestLoaded?: boolean } =
           typeof currentState === "object" && currentState !== null
             ? { ...currentState }
@@ -129,7 +120,7 @@ export const actions: Record<string, ActionConfig> = {
           newRequestData.requestLoaded = requestLoaded;
         } else {
           // clear
-          delete state[requestName as RequestName];
+          delete state[requestName as keyof InitialStatesType];
           console.log("requestName", requestName);
         }
 
