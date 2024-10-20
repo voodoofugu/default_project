@@ -2,27 +2,42 @@ import React, { createContext, useContext } from "react";
 import context, { ActionType } from "./context";
 import Storage from "../suppComponents/Storage";
 
-// Обобщенный тип для редьюсера
+// Обобщённый тип для редьюсера
 interface ActionTypeLocal<StatesType = Record<string, unknown>> {
-  reducer?: (state: StatesType, action: ActionType) => StatesType;
+  reducer?: (
+    state: StatesType,
+    action: ActionType & { payload?: Partial<StatesType> }
+  ) => StatesType;
 }
 
-type ActionsMap<StatesType = Record<string, unknown>> = Record<
-  string,
-  ActionTypeLocal<StatesType>
->;
+interface ActionsMap<StatesType = Record<string, unknown>> {
+  [actionKey: string]: ActionTypeLocal<StatesType>;
+}
 
-// Используйте ActionTypeLocal в Config
 interface Config<StatesType = Record<string, unknown>> {
   initialStates: StatesType;
   actions: ActionsMap<StatesType>;
 }
 
-// Создаём контекст, используя динамические начальные состояния и редьюсер
-const NexusContext = createContext<ReturnType<typeof context> | null>(null);
+// Создаём контекст с типом состояния
+interface NexusContextType<StatesType> {
+  useGetNexus: <K extends keyof StatesType>(stateName: K) => StatesType[K];
+  useSetNexus: () => (value: ActionType | Partial<StatesType>) => void;
+  useNexusAll: () => StatesType;
+  NexusContextProvider: ({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) => JSX.Element;
+}
 
-// Хуки для работы с состоянием
-const useGetNexus = (stateName: string) => {
+// Устанавливаем контекст с обобщенным типом
+const NexusContext = createContext<NexusContextType<any> | null>(null);
+
+// Хук для получения состояния по ключу
+const useGetNexus = <K extends keyof ReturnType<typeof useNexusAll>>(
+  stateName: K
+) => {
   const ctx = useContext(NexusContext);
   if (!ctx) {
     throw new Error("NexusProvider not found");
@@ -30,6 +45,7 @@ const useGetNexus = (stateName: string) => {
   return ctx.useGetNexus(stateName);
 };
 
+// Хук для изменения состояния
 const useSetNexus = () => {
   const ctx = useContext(NexusContext);
   if (!ctx) {
@@ -38,6 +54,7 @@ const useSetNexus = () => {
   return ctx.useSetNexus();
 };
 
+// Хук для получения всех состояний
 const useNexusAll = () => {
   const ctx = useContext(NexusContext);
   if (!ctx) {
@@ -46,7 +63,6 @@ const useNexusAll = () => {
   return ctx.useNexusAll();
 };
 
-// работа с Provider
 interface ProviderProps<StatesType> {
   initialStates: StatesType;
   actions: Config<StatesType>["actions"];
@@ -55,38 +71,39 @@ interface ProviderProps<StatesType> {
 }
 
 // NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider = <StatesType,>({
+const NexusProvider = <StatesType extends Record<string, unknown>>({
   initialStates,
   actions,
   watch,
   children,
 }: ProviderProps<StatesType>) => {
-  // Создаём редьюсер на основе переданных действий
   const reducer = createReducer<StatesType>(actions);
+  const nexus = context<StatesType>(initialStates, reducer);
 
-  // Создаём динамический контекст с помощью вашей функции context
-  const NexusContextLocal = context(initialStates, reducer);
+  const contextValue: NexusContextType<StatesType> = {
+    useGetNexus: nexus.useGetNexus,
+    useSetNexus: nexus.useSetNexus,
+    useNexusAll: nexus.useNexusAll,
+    NexusContextProvider: nexus.NexusContextProvider,
+  };
 
   return (
-    <NexusContext.Provider value={NexusContextLocal}>
-      <NexusContextLocal.NexusContextProvider>
+    <NexusContext.Provider value={contextValue}>
+      <nexus.NexusContextProvider>
         <Storage watch={watch} />
         {children}
-      </NexusContextLocal.NexusContextProvider>
+      </nexus.NexusContextProvider>
     </NexusContext.Provider>
   );
 };
 
-// Функция createReducer с дженериком State
-function createReducer<StatesType = Record<string, unknown>>(
-  actions: Config<StatesType>["actions"]
-) {
+// Функция createReducer
+function createReducer<StatesType>(actions: ActionsMap<StatesType>) {
   return function reducerNexus(
     state: StatesType,
-    action: { type: string; payload?: Partial<StatesType> }
+    action: ActionType & { payload?: Partial<StatesType> }
   ): StatesType {
     const type = action.type as keyof typeof actions;
-    const payload = action.payload;
 
     if (actions[type]) {
       const config = actions[type];
@@ -96,7 +113,7 @@ function createReducer<StatesType = Record<string, unknown>>(
       } else {
         return {
           ...state,
-          ...payload,
+          ...action.payload, // Теперь здесь будет корректный тип
         } as StatesType;
       }
     }
@@ -105,5 +122,4 @@ function createReducer<StatesType = Record<string, unknown>>(
   };
 }
 
-// Экспортируем хуки и провайдер
 export { useGetNexus, useSetNexus, useNexusAll, NexusProvider, ActionsMap };

@@ -5,7 +5,7 @@ export type ActionType = {
   payload?: any;
 };
 
-export default function context<Context>(
+export default function context<Context extends Record<string, unknown>>(
   initialStates: Context,
   reducer: (state: Context, action: ActionType) => Context
 ) {
@@ -53,15 +53,9 @@ export default function context<Context>(
   }
 
   // Хук для получения состояния по ключу
-  // Перегрузка для возвращаемого типа в зависимости от входного параметра
-  function useGetNexus(stateName: string): any;
-  function useGetNexus<SelectorOutput>(
-    stateName: string
-  ): SelectorOutput | undefined;
-
-  function useGetNexus<SelectorOutput>(
-    stateName: string
-  ): SelectorOutput | undefined {
+  function useGetNexus<K extends keyof Context>(
+    stateName: K
+  ): Context[K] | undefined {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
       console.error(`NexusContextProvider not found 👺`);
@@ -75,17 +69,14 @@ export default function context<Context>(
         state === null ||
         !(stateName in state)
       ) {
-        console.error(`State "${stateName}" not found 👺`);
+        console.error(`State "${stateName.toString()}" not found 👺`);
         return undefined;
       }
-      return (state as Record<string, SelectorOutput>)[stateName];
+      return state[stateName];
     }, [stateName, statesContext]);
 
-    // Подписка на изменения состояния по ключу
-    return React.useSyncExternalStore(
-      statesContext.subscribe,
-      getState,
-      () => getState() // Возвращаем текущее значение при инициализации
+    return React.useSyncExternalStore(statesContext.subscribe, getState, () =>
+      getState()
     );
   }
 

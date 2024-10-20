@@ -12,7 +12,7 @@ interface PokemonState {
   requestLoaded: boolean;
 }
 
-export interface InitialStatesType {
+export type InitialStatesType = Record<string, any> & {
   value1: number;
   value2: number;
   value3: string;
@@ -21,7 +21,7 @@ export interface InitialStatesType {
   pokemon1_s: PokemonState;
   pokemon2_s: PokemonState;
   value2_l: boolean;
-}
+};
 
 // Начальное состояние
 export const initialStates: InitialStatesType = {
