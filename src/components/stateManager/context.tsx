@@ -53,13 +53,11 @@ export default function context<Context extends Record<string, unknown>>(
   }
 
   // Хук для получения состояния по ключу
-  function useGetNexus<K extends keyof Context>(
-    stateName: K
-  ): Context[K] | undefined {
+  function useGetNexus<K extends keyof Context>(stateName: K): Context[K] {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
       console.error(`NexusContextProvider not found 👺`);
-      return undefined;
+      return undefined as Context[K]; // Убедитесь, что возвращаете типизированное значение
     }
 
     const getState = React.useCallback(() => {
@@ -70,13 +68,15 @@ export default function context<Context extends Record<string, unknown>>(
         !(stateName in state)
       ) {
         console.error(`State "${stateName.toString()}" not found 👺`);
-        return undefined;
+        return undefined as Context[K];
       }
       return state[stateName];
     }, [stateName, statesContext]);
 
-    return React.useSyncExternalStore(statesContext.subscribe, getState, () =>
-      getState()
+    return React.useSyncExternalStore(
+      statesContext.subscribe,
+      getState,
+      getState
     );
   }
 

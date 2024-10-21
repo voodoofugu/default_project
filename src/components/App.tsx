@@ -1,6 +1,6 @@
 import React from "react";
 
-import StyleTagCore from "./suppComponents/StyleTagCore";
+// import StyleTagCore from "./suppComponents/StyleTagCore";
 import Main from "./pageComponents/Main";
 
 import { initialStates, actions, InitialStatesType } from "./../../nexusConfig";

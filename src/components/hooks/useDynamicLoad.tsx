@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState, ComponentType, ReactNode } from "react";
 
 const loadFile = async (filePath: string): Promise<ComponentType<any>> => {

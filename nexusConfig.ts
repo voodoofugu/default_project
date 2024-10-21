@@ -8,11 +8,11 @@ interface StyleData {
 }
 
 interface PokemonState {
-  data: any | null;
+  data: unknown | null;
   requestLoaded: boolean;
 }
 
-export type InitialStatesType = Record<string, any> & {
+export type InitialStatesType = {
   value1: number;
   value2: number;
   value3: string;
@@ -103,7 +103,7 @@ export const actions: ActionsMap<InitialStatesType> = {
         // Проверяем, что state[requestName] — это объект
         const currentState =
           state[requestName as keyof InitialStatesType] || {};
-        const newRequestData: { data?: any; requestLoaded?: boolean } =
+        const newRequestData: { data?: unknown; requestLoaded?: boolean } =
           typeof currentState === "object" && currentState !== null
             ? { ...currentState }
             : {};
