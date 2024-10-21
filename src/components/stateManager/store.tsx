@@ -35,7 +35,7 @@ type ProviderProps<StatesType> = {
   children: React.ReactNode;
 };
 
-// NexusContext принимает тип состояния StatesType, который должен быть передан в момент использования
+// NexusContext принимает тип состояния StatesType
 const NexusContext = React.createContext<NexusContextType<any> | undefined>(
   undefined
 );
@@ -43,7 +43,7 @@ const NexusContext = React.createContext<NexusContextType<any> | undefined>(
 // Хук для получения состояния по ключу
 const useGetNexus = <K extends keyof ReturnType<typeof useNexusAll>>(
   stateName: K
-) => {
+): ReturnType<typeof useNexusAll>[K] => {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
     throw new Error("NexusProvider not found");
