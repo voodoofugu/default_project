@@ -1,8 +1,8 @@
 import React from "react";
 
-import StyleTag from "../suppComponents/StyleTag";
-import Pokemon1 from "../uiComponents/Pokemon1";
-import Pokemon2 from "../uiComponents/Pokemon2";
+// import StyleTag from "../suppComponents/StyleTag";
+// import Pokemon1 from "../uiComponents/Pokemon1";
+// import Pokemon2 from "../uiComponents/Pokemon2";
 
 import SomeComponent1 from "../uiComponents/SomeComponent1";
 import SomeComponent2 from "../uiComponents/SomeComponent2";

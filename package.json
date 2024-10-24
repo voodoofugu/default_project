@@ -45,6 +45,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "nexus-state": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "use-context-selector": "^2.0.0"

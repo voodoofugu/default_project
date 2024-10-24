@@ -1,6 +1,5 @@
 import React from "react";
 import context, { ActionType } from "./context";
-import Storage from "../suppComponents/Storage";
 
 // Обобщенный тип для редьюсера
 type ActionTypeLocal<StatesType = Record<string, unknown>> = {
@@ -40,7 +39,30 @@ const NexusContext = React.createContext<NexusContextType<any> | undefined>(
   undefined
 );
 
-// Хук для получения состояния по ключу
+// NexusProvider принимает конфигурацию состояний и редьюсера
+const NexusProvider = <StatesType extends Record<string, unknown>>({
+  initialStates,
+  actions,
+  children,
+}: ProviderProps<StatesType>) => {
+  const reducer = createReducer<StatesType>(actions);
+  const Nexus = context<StatesType>(initialStates, reducer);
+
+  const contextValue: NexusContextType<StatesType> = {
+    useGetNexus: Nexus.useGetNexus,
+    useSetNexus: Nexus.useSetNexus,
+    useNexusAll: Nexus.useNexusAll,
+    NexusContextProvider: Nexus.NexusContextProvider,
+  };
+
+  return (
+    <NexusContext.Provider value={contextValue}>
+      <Nexus.NexusContextProvider>{children}</Nexus.NexusContextProvider>
+    </NexusContext.Provider>
+  );
+};
+
+// Хуки для получения состояния по ключу
 const useGetNexus = <K extends keyof ReturnType<typeof useNexusAll>>(
   stateName: K
 ): ReturnType<typeof useNexusAll>[K] => {
@@ -67,33 +89,6 @@ const useNexusAll = () => {
     throw new Error("NexusProvider not found");
   }
   return ctx.useNexusAll();
-};
-
-// NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider = <StatesType extends Record<string, unknown>>({
-  initialStates,
-  actions,
-  watch,
-  children,
-}: ProviderProps<StatesType>) => {
-  const reducer = createReducer<StatesType>(actions);
-  const Nexus = context<StatesType>(initialStates, reducer);
-
-  const contextValue: NexusContextType<StatesType> = {
-    useGetNexus: Nexus.useGetNexus,
-    useSetNexus: Nexus.useSetNexus,
-    useNexusAll: Nexus.useNexusAll,
-    NexusContextProvider: Nexus.NexusContextProvider,
-  };
-
-  return (
-    <NexusContext.Provider value={contextValue}>
-      <Nexus.NexusContextProvider>
-        <Storage watch={watch} />
-        {children}
-      </Nexus.NexusContextProvider>
-    </NexusContext.Provider>
-  );
 };
 
 // Функция createReducer
