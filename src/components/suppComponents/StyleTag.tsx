@@ -1,6 +1,6 @@
 import React from "react";
 import { InitialStatesType } from "../stateManager/initialStates";
-import { useGetNexus, useSetNexus } from "../stateManager/store";
+// import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 interface StyleTagProps {
   parent: InitialStatesType["parent"];
@@ -27,49 +27,49 @@ export const styleLoading = ({
 };
 
 const StyleTag = ({
-  parent,
-  fileNames,
+  // parent,
+  // fileNames,
   children,
-  loadingElement,
-}: StyleTagProps) => {
-  const styleData = useGetNexus("styleData");
+}: // loadingElement,
+StyleTagProps) => {
+  // const styleData = useGetNexus("styleData");
 
-  const memoizedFileNames = React.useMemo(
-    () => fileNames,
-    [fileNames.join(",")]
-  );
+  // const memoizedFileNames = React.useMemo(
+  //   () => fileNames,
+  //   [fileNames.join(",")]
+  // );
 
-  const setNexus = useSetNexus();
+  // const setNexus = useSetNexus();
 
-  React.useEffect(() => {
-    setNexus({
-      type: "STYLE_DATA",
-      payload: {
-        parent: parent,
-        fileNames: memoizedFileNames,
-      },
-    });
-  }, [parent, memoizedFileNames]);
+  // React.useEffect(() => {
+  //   setNexus({
+  //     type: "STYLE_DATA",
+  //     payload: {
+  //       parent: parent,
+  //       fileNames: memoizedFileNames,
+  //     },
+  //   });
+  // }, [parent, memoizedFileNames]);
 
-  React.useEffect(() => {
-    return () => {
-      setNexus({
-        type: "STYLE_DATA",
-        payload: {
-          parent: parent,
-        },
-      });
-    };
-  }, [parent]);
+  // React.useEffect(() => {
+  //   return () => {
+  //     setNexus({
+  //       type: "STYLE_DATA",
+  //       payload: {
+  //         parent: parent,
+  //       },
+  //     });
+  //   };
+  // }, [parent]);
 
   if (children) {
     return (
       <>
-        {styleLoading({ parent: parent, styleData: styleData })
+        {/* {styleLoading({ parent: parent, styleData: styleData })
           ? children
           : loadingElement
           ? loadingElement
-          : null}
+          : null} */}
       </>
     );
   } else {

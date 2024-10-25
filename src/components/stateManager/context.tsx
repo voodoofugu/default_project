@@ -1,14 +1,36 @@
 import React from "react";
 
-export type ActionType = {
+export type ActionType<T = any> = {
   type: string;
-  payload?: any;
+  payload?: T;
 };
 
 export default function context<Context extends Record<string, unknown>>(
   initialStates: Context,
   reducer: (state: Context, action: ActionType) => Context
 ) {
+  // Добавьте этот хук в ваш файл context.tsx
+  function useSelector<K extends keyof Context>(
+    selector: (state: Context) => Context[K]
+  ): Context[K] {
+    const statesContext = React.useContext(StatesContext);
+    if (!statesContext) {
+      console.error(`NexusContextProvider not found 👺`);
+      return undefined as Context[K]; // Убедитесь, что возвращаете типизированное значение
+    }
+
+    const getSelectedState = React.useCallback(() => {
+      const state = statesContext.get();
+      return selector(state);
+    }, [statesContext, selector]);
+
+    return React.useSyncExternalStore(
+      statesContext.subscribe,
+      getSelectedState,
+      getSelectedState
+    );
+  }
+
   function useStatesContextData(): {
     get: () => Context;
     set: (value: Partial<Context>) => void;
@@ -117,6 +139,7 @@ export default function context<Context extends Record<string, unknown>>(
     useGetNexus,
     useSetNexus,
     useNexusAll,
+    useSelector,
     NexusContextProvider,
   };
 }

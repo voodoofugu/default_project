@@ -14,8 +14,8 @@
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS",
-      "typeRoots": ["./node_modules/@types"]
+      "typeRoots": ["./node_modules/@types", "./src"]
     }
   },
-  "include": ["src/**/*", "nexusConfig.ts"]
+  "include": ["./src", "nexusConfig.ts"]
 }

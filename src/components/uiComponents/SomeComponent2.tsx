@@ -1,7 +1,7 @@
 import React from "react";
 
 // import { useSetNexus } from "nexus-state";
-import { useGetNexus, useSetNexus } from "../stateManager/store";
+import { useGetNexus, useSetNexus, useSelector } from "../stateManager/store";
 
 export default function SomeComponent2(): React.ReactElement {
   // const value1 = useGetNexus<string>("value1");
@@ -15,6 +15,8 @@ export default function SomeComponent2(): React.ReactElement {
   //   });
   // };
 
+  const useSelectorValue = useSelector((state) => state.value1);
+
   const increment = () => {
     setNexus({
       type: "INCREMENT",
@@ -22,10 +24,14 @@ export default function SomeComponent2(): React.ReactElement {
   };
 
   return (
-    <div>
-      {/* <input type="text" value={value2 || ""} onChange={handleChange2} />
+    <>
+      <div>
+        {/* <input type="text" value={value2 || ""} onChange={handleChange2} />
       <p>Current input value: {value2}</p> */}
-      <button onClick={increment}> Increment</button>
-    </div>
+        <button onClick={increment}> Increment</button>
+      </div>
+
+      <p>useSelector value: {useSelectorValue}</p>
+    </>
   );
 }

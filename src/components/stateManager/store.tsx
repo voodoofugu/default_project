@@ -1,5 +1,6 @@
 import React from "react";
 import context, { ActionType } from "./context";
+import createReducer from "./createReducer";
 
 // Обобщенный тип для редьюсера
 type ActionTypeLocal<StatesType = Record<string, unknown>> = {
@@ -20,11 +21,10 @@ type NexusContextType<StatesType> = {
   useGetNexus: <K extends keyof StatesType>(stateName: K) => StatesType[K];
   useSetNexus: () => (value: ActionType | Partial<StatesType>) => void;
   useNexusAll: () => StatesType;
-  NexusContextProvider: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => JSX.Element;
+  useSelector: <K extends keyof StatesType>(
+    selector: (state: StatesType) => StatesType[K]
+  ) => StatesType[K]; // Добавлено
+  NexusContextProvider: (props: { children: React.ReactNode }) => JSX.Element;
 };
 
 type ProviderProps<StatesType> = {
@@ -52,6 +52,7 @@ const NexusProvider = <StatesType extends Record<string, unknown>>({
     useGetNexus: Nexus.useGetNexus,
     useSetNexus: Nexus.useSetNexus,
     useNexusAll: Nexus.useNexusAll,
+    useSelector: Nexus.useSelector, // Добавлено
     NexusContextProvider: Nexus.NexusContextProvider,
   };
 
@@ -64,12 +65,19 @@ const NexusProvider = <StatesType extends Record<string, unknown>>({
 
 // Хуки для получения состояния по ключу
 const useGetNexus = <K extends keyof ReturnType<typeof useNexusAll>>(
-  stateName: K
-): ReturnType<typeof useNexusAll>[K] => {
+  stateName?: K
+): ReturnType<typeof useNexusAll>[K] | ReturnType<typeof useNexusAll> => {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
     throw new Error("NexusProvider not found");
   }
+
+  // Если `stateName` не указан, возвращаем всё состояние
+  if (!stateName) {
+    return ctx.useNexusAll();
+  }
+
+  // Иначе, возвращаем значение по указанному ключу
   return ctx.useGetNexus(stateName);
 };
 
@@ -91,31 +99,19 @@ const useNexusAll = () => {
   return ctx.useNexusAll();
 };
 
-// Функция createReducer
-function createReducer<StatesType>(actions: Config<StatesType>["actions"]) {
-  return function reducerNexus(
-    state: StatesType,
-    action: { type: string; payload?: Partial<StatesType> }
-  ): StatesType {
-    const type = action.type as keyof typeof actions;
-    const payload = action.payload;
+const useSelector = <K extends keyof ReturnType<typeof useNexusAll>>(
+  selector: (
+    state: ReturnType<typeof useNexusAll>
+  ) => ReturnType<typeof useNexusAll>[K]
+): ReturnType<typeof useNexusAll>[K] => {
+  const ctx = React.useContext(NexusContext);
+  if (!ctx) {
+    throw new Error("NexusProvider not found");
+  }
 
-    if (actions[type]) {
-      const config = actions[type];
+  // Используем селектор для получения состояния
+  return ctx.useSelector(selector);
+};
 
-      if (config.reducer) {
-        return config.reducer(state, action);
-      } else {
-        return {
-          ...state,
-          ...payload,
-        } as StatesType;
-      }
-    }
-
-    return state;
-  };
-}
-
-export { useGetNexus, useSetNexus, useNexusAll, NexusProvider };
-export type { ActionsMap };
+export { useGetNexus, useSetNexus, useSelector, NexusProvider };
+export type { ActionsMap, Config };

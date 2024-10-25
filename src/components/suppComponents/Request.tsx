@@ -1,5 +1,5 @@
 import React from "react";
-import useRequest from "../hooks/useRequest";
+// import useRequest from "../hooks/useRequest";
 
 interface RequestProps {
   requestName: string;
@@ -9,23 +9,21 @@ interface RequestProps {
 }
 
 const Request: React.FC<RequestProps> = ({
-  requestName,
+  // requestName,
   url,
-  loadingElement,
+  // loadingElement,
   children,
 }) => {
-  const { requestLoaded, data } = useRequest(requestName, url);
-
-  if (!requestLoaded && !data) {
-    return <>{loadingElement || <div>Loading...</div>}</>;
-  }
-
-  if (data === "🚫") {
-    return <div>🚫 Error loading data</div>;
-  }
-
-  if (requestLoaded) {
-    return <>{children(data)}</>;
+  const wer = url;
+  // const { requestLoaded, data } = useRequest(requestName, url);
+  // if (!requestLoaded && !data) {
+  //   return <>{loadingElement || <div>Loading...</div>}</>;
+  // }
+  // if (data === "🚫") {
+  //   return <div>🚫 Error loading data</div>;
+  // }
+  if (wer) {
+    return <>{children(wer)}</>;
   }
 };
 
