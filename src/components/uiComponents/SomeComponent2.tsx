@@ -1,7 +1,7 @@
 import React from "react";
 
 // import { useSetNexus } from "nexus-state";
-import { useGetNexus, useSetNexus, useSelector } from "../stateManager/store";
+import { useSetNexus, useSelector } from "../stateManager/store";
 
 export default function SomeComponent2(): React.ReactElement {
   // const value1 = useGetNexus<string>("value1");
@@ -15,7 +15,9 @@ export default function SomeComponent2(): React.ReactElement {
   //   });
   // };
 
-  const useSelectorValue = useSelector((state) => state.value1);
+  const useSelectorValue = useSelector(
+    (state) => state.value1 + state.value2
+  ) as number;
 
   const increment = () => {
     setNexus({

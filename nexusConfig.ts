@@ -12,31 +12,20 @@ interface PokemonState {
   requestLoaded: boolean;
 }
 
-export type InitialStatesType = {
-  value1: number;
-  value2: number;
-  value3: string;
-  value4: string;
-  styleData: StyleData[];
-  pokemon1_s: PokemonState;
-  pokemon2_s: PokemonState;
-  value2_l: boolean;
-};
-
 // Начальное состояние
-export const initialStates: InitialStatesType = {
+export const initialStates = {
   value1: 1,
   value2: 2,
   value3: "3",
   value4: "4",
-  styleData: [],
-  pokemon1_s: { data: null, requestLoaded: false },
-  pokemon2_s: { data: null, requestLoaded: false },
+  styleData: [] as StyleData[],
+  pokemon1_s: { data: null, requestLoaded: false } as PokemonState,
+  pokemon2_s: { data: null, requestLoaded: false } as PokemonState,
   value2_l: false,
 };
 
 // Действия
-export const actions: ActionsMap<InitialStatesType> = {
+export const actions: ActionsMap = {
   SOME_ACTION1: {},
   SOME_ACTION2: {
     reducer(state, action) {
@@ -52,7 +41,7 @@ export const actions: ActionsMap<InitialStatesType> = {
       if (action.payload) {
         const { parent, fileNames, stylesLoaded } = action.payload;
         const existingIndex = state.styleData.findIndex(
-          (item) => item.parent === parent
+          (item: StyleData) => item.parent === parent
         );
 
         const newStyleData = [...state.styleData];
@@ -95,44 +84,43 @@ export const actions: ActionsMap<InitialStatesType> = {
     },
   },
 
-  REQUEST_DATA: {
-    reducer(state, action) {
-      if (action.payload) {
-        const { requestName, data, requestLoaded } = action.payload;
+  // REQUEST_DATA: {
+  //   reducer(state, action) {
+  //     if (action.payload) {
+  //       const { requestName, data, requestLoaded } = action.payload;
 
-        // Проверяем, что state[requestName] — это объект
-        const currentState =
-          state[requestName as keyof InitialStatesType] || {};
-        const newRequestData: { data?: unknown; requestLoaded?: boolean } =
-          typeof currentState === "object" && currentState !== null
-            ? { ...currentState }
-            : {};
+  //       // Проверяем, что state[requestName] — это объект
+  //       const currentState = state[requestName as keyof NexusStatesT] || {};
+  //       const newRequestData: { data?: unknown; requestLoaded?: boolean } =
+  //         typeof currentState === "object" && currentState !== null
+  //           ? { ...currentState }
+  //           : {};
 
-        if (data !== undefined) {
-          // update
-          newRequestData.data = data;
-          if (!("requestLoaded" in newRequestData)) {
-            newRequestData.requestLoaded = false;
-          }
-        }
-        if (requestLoaded !== undefined) {
-          // update requestLoaded
-          newRequestData.requestLoaded = requestLoaded;
-        } else {
-          // clear
-          delete state[requestName as keyof InitialStatesType];
-          console.log("requestName", requestName);
-        }
+  //       if (data !== undefined) {
+  //         // update
+  //         newRequestData.data = data;
+  //         if (!("requestLoaded" in newRequestData)) {
+  //           newRequestData.requestLoaded = false;
+  //         }
+  //       }
+  //       if (requestLoaded !== undefined) {
+  //         // update requestLoaded
+  //         newRequestData.requestLoaded = requestLoaded;
+  //       } else {
+  //         // clear
+  //         delete state[requestName as keyof NexusStatesT];
+  //         console.log("requestName", requestName);
+  //       }
 
-        return {
-          ...state,
-          [requestName]: newRequestData,
-        };
-      }
+  //       return {
+  //         ...state,
+  //         [requestName]: newRequestData,
+  //       };
+  //     }
 
-      return state;
-    },
-  },
+  //     return state;
+  //   },
+  // },
 
   UPDATE_INPUT1: {
     reducer(state, action) {

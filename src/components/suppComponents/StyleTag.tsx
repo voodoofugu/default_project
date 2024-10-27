@@ -1,10 +1,10 @@
 import React from "react";
-import { InitialStatesType } from "../stateManager/initialStates";
+import { NexusStatesT } from "../stateManager/initialStates";
 // import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 interface StyleTagProps {
-  parent: InitialStatesType["parent"];
-  fileNames: InitialStatesType["fileNames"];
+  parent: NexusStatesT["parent"];
+  fileNames: NexusStatesT["fileNames"];
   children?: React.ReactNode;
   loadingElement?: React.ReactNode;
 }
@@ -14,7 +14,7 @@ export const styleLoading = ({
   styleData,
 }: {
   parent: StyleTagProps["parent"];
-  styleData: InitialStatesType["styleData"];
+  styleData: NexusStatesT["styleData"];
 }) => {
   let stylesLoaded = false;
   styleData.forEach((styleObj) => {

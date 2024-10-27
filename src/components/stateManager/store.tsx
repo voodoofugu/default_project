@@ -2,57 +2,61 @@ import React from "react";
 import context, { ActionType } from "./context";
 import createReducer from "./createReducer";
 
-// Обобщенный тип для редьюсера
-type ActionTypeLocal<StatesType = Record<string, unknown>> = {
-  reducer?: (state: StatesType, action: ActionType) => StatesType;
+type DefaultStatesT<T = any> = {
+  [key: string]: T;
 };
 
-type ActionsMap<StatesType = Record<string, unknown>> = {
-  [actionKey: string]: ActionTypeLocal<StatesType>;
+// Пример использования
+export type S = typeof import("../../../nexusConfig") extends {
+  initialStates: infer U;
+}
+  ? U
+  : DefaultStatesT;
+
+// Тип для редьюсера, использующий глобальный S
+type ActionTypeLocal = {
+  reducer?: (state: S, action: ActionType) => S;
 };
 
-type Config<StatesType = Record<string, unknown>> = {
-  initialStates: StatesType;
-  actions: ActionsMap<StatesType>;
+type ActionsMap = {
+  [actionKey: string]: ActionTypeLocal;
 };
 
-// Создаём контекст, принимающий тип состояния StatesType
-type NexusContextType<StatesType> = {
-  useGetNexus: <K extends keyof StatesType>(stateName: K) => StatesType[K];
-  useSetNexus: () => (value: ActionType | Partial<StatesType>) => void;
-  useNexusAll: () => StatesType;
-  useSelector: <K extends keyof StatesType>(
-    selector: (state: StatesType) => StatesType[K]
-  ) => StatesType[K]; // Добавлено
+type Config = {
+  initialStates: S;
+  actions: ActionsMap;
+};
+
+// Создаём контекст с типом состояния S
+type NexusContextType = {
+  useGetNexus: <K extends keyof S>(stateName: K) => S[K];
+  useSetNexus: () => (value: ActionType | Partial<S>) => void;
+  useNexusAll: () => S;
+  useSelector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
   NexusContextProvider: (props: { children: React.ReactNode }) => JSX.Element;
 };
 
-type ProviderProps<StatesType> = {
-  initialStates: StatesType;
-  actions: Config<StatesType>["actions"];
-  watch?: boolean;
+type ProviderProps = {
+  initialStates: S;
+  actions: Config["actions"];
   children: React.ReactNode;
 };
 
-// NexusContext принимает тип состояния StatesType
-const NexusContext = React.createContext<NexusContextType<any> | undefined>(
+// NexusContext принимает тип состояния S
+const NexusContext = React.createContext<NexusContextType | undefined>(
   undefined
 );
 
 // NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider = <StatesType extends Record<string, unknown>>({
-  initialStates,
-  actions,
-  children,
-}: ProviderProps<StatesType>) => {
-  const reducer = createReducer<StatesType>(actions);
-  const Nexus = context<StatesType>(initialStates, reducer);
+const NexusProvider = ({ initialStates, actions, children }: ProviderProps) => {
+  const reducer = createReducer(actions);
+  const Nexus = context(initialStates, reducer);
 
-  const contextValue: NexusContextType<StatesType> = {
+  const contextValue: NexusContextType = {
     useGetNexus: Nexus.useGetNexus,
     useSetNexus: Nexus.useSetNexus,
     useNexusAll: Nexus.useNexusAll,
-    useSelector: Nexus.useSelector, // Добавлено
+    useSelector: Nexus.useSelector,
     NexusContextProvider: Nexus.NexusContextProvider,
   };
 
@@ -63,54 +67,33 @@ const NexusProvider = <StatesType extends Record<string, unknown>>({
   );
 };
 
-// Хуки для получения состояния по ключу
-const useGetNexus = <K extends keyof ReturnType<typeof useNexusAll>>(
-  stateName?: K
-): ReturnType<typeof useNexusAll>[K] | ReturnType<typeof useNexusAll> => {
+function contextExist() {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
-    throw new Error("NexusProvider not found");
+    throw new Error("NexusProvider not found 👺");
   }
+  return ctx;
+}
 
-  // Если `stateName` не указан, возвращаем всё состояние
-  if (!stateName) {
-    return ctx.useNexusAll();
-  }
+// Хуки для получения состояния по ключу
+// Перегрузка для обработки двух случаев
+function useGetNexus<K extends keyof S>(stateName: K): S[K];
+function useGetNexus(): S;
 
-  // Иначе, возвращаем значение по указанному ключу
-  return ctx.useGetNexus(stateName);
+function useGetNexus(stateName?: keyof S) {
+  const ctx = contextExist();
+  return stateName ? ctx.useGetNexus(stateName) : ctx.useNexusAll();
+}
+
+const useSelector = <K extends keyof S>(selector: (state: S) => S[K]): S[K] => {
+  const ctx = contextExist();
+  return ctx.useSelector(selector);
 };
 
 // Хук для изменения состояния
 const useSetNexus = () => {
-  const ctx = React.useContext(NexusContext);
-  if (!ctx) {
-    throw new Error("NexusProvider not found");
-  }
+  const ctx = contextExist();
   return ctx.useSetNexus();
-};
-
-// Хук для получения всех состояний
-const useNexusAll = () => {
-  const ctx = React.useContext(NexusContext);
-  if (!ctx) {
-    throw new Error("NexusProvider not found");
-  }
-  return ctx.useNexusAll();
-};
-
-const useSelector = <K extends keyof ReturnType<typeof useNexusAll>>(
-  selector: (
-    state: ReturnType<typeof useNexusAll>
-  ) => ReturnType<typeof useNexusAll>[K]
-): ReturnType<typeof useNexusAll>[K] => {
-  const ctx = React.useContext(NexusContext);
-  if (!ctx) {
-    throw new Error("NexusProvider not found");
-  }
-
-  // Используем селектор для получения состояния
-  return ctx.useSelector(selector);
 };
 
 export { useGetNexus, useSetNexus, useSelector, NexusProvider };

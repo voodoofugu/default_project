@@ -2,7 +2,7 @@ import React from "react";
 
 // import { useGetNexus, useSetNexus } from "nexus-state";
 import { useGetNexus, useSetNexus } from "../stateManager/store";
-// import { InitialStatesType } from "../../../nexusConfig";
+// import { NexusStatesT } from "../../../nexusConfig";
 
 export default function SomeComponent1(): React.ReactElement {
   const value1 = useGetNexus("value1");

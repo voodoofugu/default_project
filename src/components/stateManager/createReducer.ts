@@ -1,13 +1,10 @@
-import { Config } from "./store";
+import { Config, S } from "./store";
 
-// Функция createReducer
-export default function createReducer<StatesType>(
-  actions: Config<StatesType>["actions"]
-) {
+export default function createReducer(actions: Config["actions"]) {
   return function reducerNexus(
-    state: StatesType,
-    action: { type: string; payload?: Partial<StatesType> }
-  ): StatesType {
+    state: S,
+    action: { type: string; payload?: Partial<S> }
+  ): S {
     const type = action.type as keyof typeof actions;
     const payload = action.payload;
 
@@ -20,7 +17,7 @@ export default function createReducer<StatesType>(
         return {
           ...state,
           ...payload,
-        } as StatesType;
+        } as S;
       }
     }
 

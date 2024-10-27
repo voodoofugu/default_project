@@ -1,4 +1,4 @@
-export interface InitialStatesType {
+export interface NexusStatesT {
   [key: string]: any;
   styleData: Array<{
     parent: string;
@@ -9,7 +9,7 @@ export interface InitialStatesType {
   someData?: string;
 }
 
-const initialStates: InitialStatesType = {
+const initialStates: NexusStatesT = {
   styleData: [],
   someData: "123",
 };

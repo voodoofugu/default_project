@@ -1,16 +1,16 @@
 import React from "react";
-import { InitialStatesType } from "../stateManager/initialStates";
+import { NexusStatesT } from "../stateManager/initialStates";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
 export interface DynamicStyleArray {
-  styleData: InitialStatesType["styleData"];
+  styleData: NexusStatesT["styleData"];
   setStyleData: (value: { type: string; payload: any }) => void;
 }
 
 export const clearStyles = ({
   parent,
   fileNames,
-}: InitialStatesType["styleData"][0]) => {
+}: NexusStatesT["styleData"][0]) => {
   const argsForRemove = document.head.querySelectorAll(`[${parent}="⚡"]`);
   const idsForRemove = Array.from(argsForRemove).map((el) => el.id);
 
@@ -39,7 +39,7 @@ export const createStateTag = (parent: string, fileName: string) => {
 };
 
 export const loadStyles = async (
-  { parent, fileNames, stylesLoaded }: InitialStatesType["styleData"][0],
+  { parent, fileNames, stylesLoaded }: NexusStatesT["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
   if (fileNames.length === 0) {
@@ -65,7 +65,7 @@ export const loadStyles = async (
 };
 
 const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
-  const prevStyleArrayRef = React.useRef<InitialStatesType["styleData"]>([]);
+  const prevStyleArrayRef = React.useRef<NexusStatesT["styleData"]>([]);
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
   const handleStyleLoad = (
@@ -109,7 +109,7 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
     }
   }, [styleData]);
 
-  const loadStyleArray = (styleData: InitialStatesType["styleData"]) => {
+  const loadStyleArray = (styleData: NexusStatesT["styleData"]) => {
     styleData.forEach((styleObj) => {
       const prevParent = prevStyleArrayRef.current.find(
         (s) => s.parent === styleObj.parent
