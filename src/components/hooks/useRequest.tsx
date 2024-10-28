@@ -9,24 +9,24 @@ import React from "react";
 export default function useRequest(requestName: string, url: string) {
   // const requestData = useGetNexus(requestName);
 
-  const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
+  // const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
 
   // const setNexus = useSetNexus();
 
   React.useEffect(() => {
     let isMounted = true;
 
-    if (storageRequestName[requestName].url === url) {
-      // setNexus({
-      //   type: "REQUEST_DATA",
-      //   payload: {
-      //     requestName: requestName,
-      //     data: storageRequestName[requestName].data,
-      //     requestLoaded: storageRequestName[requestName].requestLoaded,
-      //   },
-      // });
-      return;
-    }
+    // if (storageRequestName[requestName].url === url) {
+    //   // setNexus({
+    //   //   type: "REQUEST_DATA",
+    //   //   payload: {
+    //   //     requestName: requestName,
+    //   //     data: storageRequestName[requestName].data,
+    //   //     requestLoaded: storageRequestName[requestName].requestLoaded,
+    //   //   },
+    //   // });
+    //   return;
+    // }
 
     (async () => {
       try {

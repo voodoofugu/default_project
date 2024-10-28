@@ -42,10 +42,14 @@ export const loadStyles = async (
   { parent, fileNames, stylesLoaded }: NexusStatesT["styleData"][0],
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
-  if (fileNames.length === 0) {
+  if (
+    fileNames &&
+    typeof stylesLoaded === "boolean" &&
+    fileNames.length === 0
+  ) {
     onLoad(parent, 0, stylesLoaded);
     console.log(`🚫 Array with the parent "${parent}" is empty`);
-  } else {
+  } else if (fileNames && stylesLoaded) {
     for (const fileName of fileNames) {
       const styleElement = createStateTag(parent, fileName);
       try {
@@ -53,7 +57,7 @@ export const loadStyles = async (
           `../../style/css/${fileName}.css`
         );
         styleElement.textContent = text;
-        if (styleElement.textContent.length > 0) {
+        if (styleElement.textContent && styleElement.textContent.length > 0) {
           onLoad(parent, fileNames.length, stylesLoaded);
         }
       } catch (error) {
@@ -116,9 +120,9 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
       );
 
       let removedFileNames: string[] = [];
-      if (prevParent) {
+      if (prevParent && prevParent.fileNames) {
         removedFileNames = prevParent.fileNames.filter(
-          (fileName) => !styleObj.fileNames.includes(fileName)
+          (fileName) => !styleObj.fileNames!.includes(fileName) // Утверждаем, что fileNames не undefined
         );
       }
 
@@ -136,7 +140,11 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
           removedObjects.forEach((removedObject) => {
             clearStyles(removedObject);
           });
-        } else if (prevParent.fileNames.length > styleObj.fileNames.length) {
+        } else if (
+          prevParent.fileNames &&
+          styleObj.fileNames &&
+          prevParent.fileNames.length > styleObj.fileNames.length
+        ) {
           clearStyles({
             parent: styleObj.parent,
             fileNames: removedFileNames,

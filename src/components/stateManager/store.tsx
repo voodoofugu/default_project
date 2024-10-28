@@ -1,5 +1,5 @@
 import React from "react";
-import context, { ActionType } from "./context";
+import context, { A } from "./context";
 import createReducer from "./createReducer";
 
 type DefaultStatesT<T = any> = {
@@ -7,7 +7,7 @@ type DefaultStatesT<T = any> = {
 };
 
 // Пример использования
-export type S = typeof import("../../../nexusConfig") extends {
+export type S = typeof import("../../../nexusConfigCopy") extends {
   initialStates: infer U;
 }
   ? U
@@ -15,7 +15,7 @@ export type S = typeof import("../../../nexusConfig") extends {
 
 // Тип для редьюсера, использующий глобальный S
 type ActionTypeLocal = {
-  reducer?: (state: S, action: ActionType) => S;
+  reducer?: (state: S, action: A) => S;
 };
 
 type ActionsMap = {
@@ -30,7 +30,7 @@ type Config = {
 // Создаём контекст с типом состояния S
 type NexusContextType = {
   useGetNexus: <K extends keyof S>(stateName: K) => S[K];
-  useSetNexus: () => (value: ActionType | Partial<S>) => void;
+  useSetNexus: () => (value: A | Partial<S>) => void;
   useNexusAll: () => S;
   useSelector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
   NexusContextProvider: (props: { children: React.ReactNode }) => JSX.Element;

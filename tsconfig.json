@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "strict": true,
+    "strictNullChecks": true,
     "noImplicitAny": true,
+    "outDir": "./dist/",
     "module": "ESNext",
     "target": "es2017",
     "jsx": "react-jsx",

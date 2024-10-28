@@ -1,26 +1,25 @@
 import React from "react";
 
-export type ActionType<T = any> = {
+export type A<T = any> = {
   type: string;
   payload?: T;
 };
 
-export default function context<Context extends Record<string, any>>(
-  initialStates: Context,
-  reducer: (state: Context, action: ActionType) => Context
+export default function context<S extends Record<keyof S, any>>(
+  initialStates: S,
+  reducer: (state: S, action: A) => S
 ) {
   function useStatesContextData(): {
-    get: () => Context;
-    set: (value: Partial<Context>) => void;
+    get: () => S;
+    set: (value: Partial<S>) => void;
     subscribe: (callback: () => void) => () => void;
   } {
     const store = React.useRef(initialStates);
+    const subscribers = React.useRef(new Set<() => void>());
 
     const get = React.useCallback(() => store.current, []);
 
-    const subscribers = React.useRef(new Set<() => void>());
-
-    const set = React.useCallback((value: Partial<Context>) => {
+    const set = React.useCallback((value: Partial<S>) => {
       store.current = { ...store.current, ...value };
       subscribers.current.forEach((callback) => callback());
     }, []);
@@ -53,8 +52,13 @@ export default function context<Context extends Record<string, any>>(
   }
 
   // Хук для получения состояния по ключу
-  function useGetNexus<K extends keyof Context>(stateName: K): Context[K] {
+  function useGetNexus<K extends keyof S>(stateName: K): S[K] {
     const statesContext = React.useContext(StatesContext);
+
+    // Проверяем, существует ли контекст
+    if (!statesContext) {
+      throw new Error("NexusContextProvider not found 👺");
+    }
 
     if (!(stateName in statesContext.get())) {
       console.error(`State "${String(stateName)}" in useGetNexus not found 👺`);
@@ -67,10 +71,14 @@ export default function context<Context extends Record<string, any>>(
     );
   }
 
-  function useSelector<K extends keyof Context>(
-    selector: (state: Context) => Context[K]
-  ): Context[K] {
+  function useSelector<K extends keyof S>(selector: (state: S) => S[K]): S[K] {
     const statesContext = React.useContext(StatesContext);
+
+    // Проверяем, существует ли контекст
+    if (!statesContext) {
+      throw new Error("NexusContextProvider not found 👺");
+    }
+
     const state = statesContext.get();
 
     // Проверяем, существует ли выбранное значение
@@ -86,22 +94,32 @@ export default function context<Context extends Record<string, any>>(
   }
 
   // Хук для обновления состояния по ключу или dispatch action
-  function useSetNexus(): (value: Partial<Context> | ActionType) => void {
+  function useSetNexus(): (value: Partial<S> | A) => void {
     const statesContext = React.useContext(StatesContext);
 
-    return (value: Partial<Context> | ActionType) => {
+    // Проверяем, существует ли контекст
+    if (!statesContext) {
+      throw new Error("NexusContextProvider not found 👺");
+    }
+
+    return (value: Partial<S> | A) => {
       if ("type" in value) {
-        const newState = reducer(statesContext.get(), value as ActionType);
+        const newState = reducer(statesContext.get(), value as A);
         statesContext.set(newState);
       } else {
-        statesContext.set(value as Partial<Context>);
+        statesContext.set(value as Partial<S>);
       }
     };
   }
 
   // Для получения всего состояния
-  function useNexusAll(): Context {
+  function useNexusAll(): S {
     const statesContext = React.useContext(StatesContext);
+
+    // Проверяем, существует ли контекст
+    if (!statesContext) {
+      throw new Error("NexusContextProvider not found 👺");
+    }
 
     return React.useSyncExternalStore(
       statesContext.subscribe,

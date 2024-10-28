@@ -25,17 +25,17 @@ const Image: React.FC<ImageProps> = ({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  React.useEffect(() => {
-    const validFormats = /\.(png|svg|jpe?g|webp|eps|tiff?)$/i;
-    if (!validFormats.test(src)) {
-      setIsLoaded(null);
-      console.error("🚫 Invalid image format");
-    } else {
-      if (isLoaded === null) {
-        setIsLoaded(false);
-      }
-    }
-  }, [src]);
+  // React.useEffect(() => {
+  //   const validFormats = /\.(png|svg|jpe?g|webp|eps|tiff?)$/i;
+  //   if (!validFormats.test(src)) {
+  //     setIsLoaded(null);
+  //     console.error("🚫 Invalid image format");
+  //   } else {
+  //     if (isLoaded === null) {
+  //       setIsLoaded(false);
+  //     }
+  //   }
+  // }, [src]);
 
   if (isLoaded === null) {
     return (
@@ -101,7 +101,7 @@ const Image: React.FC<ImageProps> = ({
           objectFit: "cover",
         }}
         onLoad={() => setIsLoaded(true)}
-        onError={() => (setIsLoaded(null), console.error("🚫 Image not faund"))}
+        // onError={() => (setIsLoaded(null), console.error("🚫 Image not faund"))}
       />
 
       {!isLoaded && placeholder && (
