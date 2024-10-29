@@ -1,4 +1,4 @@
-import { ActionsMap } from "./src/components/stateManager/store";
+import { ActionsMap } from "./src/components/stateManager/loadUserConfig";
 
 // Определение интерфейсов для состояния и действий
 interface StyleData {

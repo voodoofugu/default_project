@@ -1,54 +1,48 @@
-import React from "react";
-import context, { A } from "./context";
+import React, { useEffect, useState } from "react";
+import context from "./context";
 import createReducer from "./createReducer";
-
-type DefaultStatesT<T = any> = {
-  [key: string]: T;
-};
-
-// Пример использования
-export type S = typeof import("../../../nexusConfigCopy") extends {
-  initialStates: infer U;
-}
-  ? U
-  : DefaultStatesT;
-
-// Тип для редьюсера, использующий глобальный S
-type ActionTypeLocal = {
-  reducer?: (state: S, action: A) => S;
-};
-
-type ActionsMap = {
-  [actionKey: string]: ActionTypeLocal;
-};
-
-type Config = {
-  initialStates: S;
-  actions: ActionsMap;
-};
+import loadUserConfig, { S, ActionsMap } from "./loadUserConfig";
 
 // Создаём контекст с типом состояния S
 type NexusContextType = {
   useGetNexus: <K extends keyof S>(stateName: K) => S[K];
-  useSetNexus: () => (value: A | Partial<S>) => void;
+  useSetNexus: () => (value: ActionsMap | Partial<S>) => void;
   useNexusAll: () => S;
   useSelector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
-  NexusContextProvider: (props: { children: React.ReactNode }) => JSX.Element;
 };
 
-type ProviderProps = {
-  initialStates: S;
-  actions: Config["actions"];
-  children: React.ReactNode;
-};
-
-// NexusContext принимает тип состояния S
 const NexusContext = React.createContext<NexusContextType | undefined>(
   undefined
 );
 
 // NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider = ({ initialStates, actions, children }: ProviderProps) => {
+const NexusProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [initialStates, setInitialStates] = useState<S | null>(null);
+  const [actions, setActions] = useState<ActionsMap | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      const config = await loadUserConfig();
+      if (config) {
+        setInitialStates(config.initialStates);
+        setActions(config.actions);
+      }
+      setIsLoading(false);
+    };
+    loadConfig();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // или любой другой индикатор загрузки
+  }
+
+  if (!initialStates || !actions) {
+    return <div>Error loading configuration</div>; // обработка ошибок
+  }
+
   const reducer = createReducer(actions);
   const Nexus = context(initialStates, reducer);
 
@@ -57,7 +51,6 @@ const NexusProvider = ({ initialStates, actions, children }: ProviderProps) => {
     useSetNexus: Nexus.useSetNexus,
     useNexusAll: Nexus.useNexusAll,
     useSelector: Nexus.useSelector,
-    NexusContextProvider: Nexus.NexusContextProvider,
   };
 
   return (
@@ -67,6 +60,7 @@ const NexusProvider = ({ initialStates, actions, children }: ProviderProps) => {
   );
 };
 
+// Хуки для получения состояния по ключу
 function contextExist() {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
@@ -75,11 +69,8 @@ function contextExist() {
   return ctx;
 }
 
-// Хуки для получения состояния по ключу
-// Перегрузка для обработки двух случаев
 function useGetNexus<K extends keyof S>(stateName: K): S[K];
 function useGetNexus(): S;
-
 function useGetNexus(stateName?: keyof S) {
   const ctx = contextExist();
   return stateName ? ctx.useGetNexus(stateName) : ctx.useNexusAll();
@@ -97,4 +88,3 @@ const useSetNexus = () => {
 };
 
 export { useGetNexus, useSetNexus, useSelector, NexusProvider };
-export type { ActionsMap, Config };

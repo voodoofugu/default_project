@@ -13,11 +13,5 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "."
   },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "CommonJS",
-      "typeRoots": ["./node_modules/@types", "./src", "./nexusConfig"]
-    }
-  },
-  "include": ["./src", "nexusConfig.ts"]
+  "include": ["./src"]
 }
