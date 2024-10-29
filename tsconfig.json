@@ -13,5 +13,11 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "."
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "typeRoots": ["./node_modules/@types", "./src"]
+    }
+  },
   "include": ["./src"]
 }
