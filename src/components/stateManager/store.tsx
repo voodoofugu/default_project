@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import context from "./context";
 import createReducer from "./createReducer";
-import loadUserConfig, { S, ActionsMap } from "./loadUserConfig";
+import { S, A, initialStates, actions } from "./loadUserConfig";
 
 // Создаём контекст с типом состояния S
 type NexusContextType = {
   useGetNexus: <K extends keyof S>(stateName: K) => S[K];
-  useSetNexus: () => (value: ActionsMap | Partial<S>) => void;
+  useSetNexus: () => ({ actionType, payload }: A) => void;
   useNexusAll: () => S;
   useSelector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
 };
@@ -19,31 +19,12 @@ const NexusContext = React.createContext<NexusContextType | undefined>(
 const NexusProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [initialStates, setInitialStates] = useState<S | null>(null);
-  const [actions, setActions] = useState<ActionsMap | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadConfig = async () => {
-      const config = await loadUserConfig();
-      if (config) {
-        setInitialStates(config.initialStates);
-        setActions(config.actions);
-      }
-      setIsLoading(false);
-    };
-    loadConfig();
-  }, []);
-
-  if (isLoading) {
-    return <div>Loading...</div>; // или любой другой индикатор загрузки
-  }
-
   if (!initialStates || !actions) {
-    return <div>Error loading configuration</div>; // обработка ошибок
+    console.error("Error loading nexusConfig 👺");
+    return <>{children}</>; // Обернуть в React Fragment
   }
 
-  const reducer = createReducer(actions);
+  const reducer = createReducer(actions); // Убедитесь, что передаёте ActionsMap
   const Nexus = context(initialStates, reducer);
 
   const contextValue: NexusContextType = {

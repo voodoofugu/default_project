@@ -1,37 +1,35 @@
-export type S<T = any> = {
-  [key: string]: T;
-};
-
 export type A<T = any> = {
-  type: string;
+  actionType: ActionKey; // Используем ActionKey вместо string
   payload?: T;
 };
 
 export type ActionsMap = {
-  [actionKey: string]: { reducer?: (state: S, action: A) => S };
+  [key in ActionKey]: {
+    reducer?: (state: S, action: A) => S;
+  };
 };
 
-export default async function loadConfig(): Promise<{
-  initialStates: S;
-  actions: ActionsMap;
-} | null>;
+// Заглушки для начальных типов
+export type S = typeof import("../../../nexusConfig").initialStates;
+type ActionKey = keyof typeof import("../../../nexusConfig").actions;
 
-export default async function loadConfig<T = any>(): Promise<{
-  initialStates: S<T>;
-  actions: ActionsMap;
-} | null> {
-  try {
-    const config = await import("../../../nexusConfig");
-
-    // Получаем типы начальных состояний
-    type InitialStatesType = typeof config.initialStates;
-
-    return {
-      initialStates: config.initialStates as S<InitialStatesType>,
-      actions: config.actions,
-    };
-  } catch (error) {
-    console.error("Nexus failed to load the `nexusConfig`", error);
-    return null;
-  }
+function createAction(reducer?: (state: S, action: A) => S) {
+  return { reducer };
 }
+
+let initialStates: S = {} as S; // Инициализация как пустой объект
+let actions: ActionsMap;
+
+try {
+  const config = require("../../../nexusConfig");
+  initialStates = config.initialStates as S; // Приведение типа
+  actions = config.actions;
+} catch (error) {
+  console.error(
+    "Nexus failed to load the `nexusConfig`. Using default configuration.",
+    error
+  );
+}
+
+// Экспортируем как типизированные объекты
+export { initialStates, actions, createAction };

@@ -21,7 +21,7 @@ export default function SomeComponent2(): React.ReactElement {
 
   const increment = () => {
     setNexus({
-      type: "INCREMENT",
+      actionType: "INCREMENT",
     });
   };
 

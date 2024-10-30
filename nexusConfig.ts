@@ -1,4 +1,4 @@
-import { ActionsMap } from "./src/components/stateManager/loadUserConfig";
+import { createAction } from "./src/components/stateManager/loadUserConfig";
 
 // Определение интерфейсов для состояния и действий
 interface StyleData {
@@ -25,64 +25,58 @@ export const initialStates = {
 };
 
 // Действия
-export const actions: ActionsMap = {
-  SOME_ACTION1: {},
-  SOME_ACTION2: {
-    reducer(state, action) {
+export const actions = {
+  SOME_ACTION1: createAction(),
+  SOME_ACTION2: createAction((state, action) => ({
+    ...state,
+    ...action.payload,
+  })),
+
+  STYLE_DATA: createAction((state, action) => {
+    if (action.payload) {
+      const { parent, fileNames, stylesLoaded } = action.payload;
+      const existingIndex = state.styleData.findIndex(
+        (item: StyleData) => item.parent === parent
+      );
+
+      const newStyleData = [...state.styleData];
+
+      if ("fileNames" in action.payload) {
+        // push/update
+        if (existingIndex !== -1) {
+          newStyleData[existingIndex] = {
+            ...newStyleData[existingIndex],
+            fileNames,
+          };
+        } else {
+          newStyleData.push({
+            parent: parent,
+            fileNames: fileNames,
+            stylesLoaded: false,
+          });
+        }
+      } else if ("stylesLoaded" in action.payload) {
+        // loading
+        if (existingIndex !== -1) {
+          newStyleData[existingIndex] = {
+            ...newStyleData[existingIndex],
+            stylesLoaded,
+          };
+        }
+      } else {
+        // clear
+        if (existingIndex !== -1) {
+          newStyleData.splice(existingIndex, 1);
+        }
+      }
+
       return {
         ...state,
-        ...action.payload,
+        styleData: newStyleData,
       };
-    },
-  },
-
-  STYLE_DATA: {
-    reducer(state, action) {
-      if (action.payload) {
-        const { parent, fileNames, stylesLoaded } = action.payload;
-        const existingIndex = state.styleData.findIndex(
-          (item: StyleData) => item.parent === parent
-        );
-
-        const newStyleData = [...state.styleData];
-
-        if ("fileNames" in action.payload) {
-          // push/update
-          if (existingIndex !== -1) {
-            newStyleData[existingIndex] = {
-              ...newStyleData[existingIndex],
-              fileNames,
-            };
-          } else {
-            newStyleData.push({
-              parent: parent,
-              fileNames: fileNames,
-              stylesLoaded: false,
-            });
-          }
-        } else if ("stylesLoaded" in action.payload) {
-          // loading
-          if (existingIndex !== -1) {
-            newStyleData[existingIndex] = {
-              ...newStyleData[existingIndex],
-              stylesLoaded,
-            };
-          }
-        } else {
-          // clear
-          if (existingIndex !== -1) {
-            newStyleData.splice(existingIndex, 1);
-          }
-        }
-
-        return {
-          ...state,
-          styleData: newStyleData,
-        };
-      }
-      return state;
-    },
-  },
+    }
+    return state;
+  }),
 
   // REQUEST_DATA: {
   //   reducer(state, action) {
@@ -122,30 +116,18 @@ export const actions: ActionsMap = {
   //   },
   // },
 
-  UPDATE_INPUT1: {
-    reducer(state, action) {
-      return {
-        ...state,
-        value1: action.payload,
-      };
-    },
-  },
+  UPDATE_INPUT1: createAction((state, action) => ({
+    ...state,
+    value1: action.payload,
+  })),
 
-  UPDATE_INPUT2: {
-    reducer(state, action) {
-      return {
-        ...state,
-        value2: action.payload,
-      };
-    },
-  },
+  UPDATE_INPUT2: createAction((state, action) => ({
+    ...state,
+    value2: action.payload,
+  })),
 
-  INCREMENT: {
-    reducer(state) {
-      return {
-        ...state,
-        value2: state.value2 + 1,
-      };
-    },
-  },
+  INCREMENT: createAction((state) => ({
+    ...state,
+    value2: state.value2 + 1,
+  })),
 };

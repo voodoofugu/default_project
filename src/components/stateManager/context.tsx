@@ -1,9 +1,5 @@
 import React from "react";
-
-export type A<T = any> = {
-  type: string;
-  payload?: T;
-};
+import { A } from "./loadUserConfig";
 
 export default function context<S extends Record<keyof S, any>>(
   initialStates: S,

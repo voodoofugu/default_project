@@ -6,12 +6,13 @@ import { useGetNexus, useSetNexus } from "../stateManager/store";
 
 export default function SomeComponent1(): React.ReactElement {
   const value1 = useGetNexus("value1");
+  console.log("value1", typeof value1);
 
   const setNexus = useSetNexus();
 
   const handleChange1 = (e: any) => {
     setNexus({
-      type: "UPDATE_INPUT1",
+      actionType: "UPDATE_INPUT1",
       payload: e.target.value,
     });
   };
