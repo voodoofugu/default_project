@@ -1,39 +1,39 @@
 import React from "react";
-import { A } from "./loadUserConfig";
+import { S, A } from "./loadUserConfig";
 
-export default function context<S extends Record<keyof S, any>>(
+type UseStatesContextDataReturnType = ReturnType<typeof useStatesContextData>;
+
+function useStatesContextData(initialStates: S): {
+  get: () => S;
+  set: (value: Partial<S>) => void;
+  subscribe: (callback: () => void) => () => void;
+} {
+  const store = React.useRef(initialStates);
+  const subscribers = React.useRef(new Set<() => void>());
+
+  const get = React.useCallback(() => store.current, []);
+
+  const set = React.useCallback((value: Partial<S>) => {
+    store.current = { ...store.current, ...value };
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
+  const subscribe = React.useCallback((callback: () => void) => {
+    subscribers.current.add(callback);
+    return () => subscribers.current.delete(callback);
+  }, []);
+
+  return {
+    get,
+    set,
+    subscribe,
+  };
+}
+
+export default function context(
   initialStates: S,
   reducer: (state: S, action: A) => S
 ) {
-  function useStatesContextData(): {
-    get: () => S;
-    set: (value: Partial<S>) => void;
-    subscribe: (callback: () => void) => () => void;
-  } {
-    const store = React.useRef(initialStates);
-    const subscribers = React.useRef(new Set<() => void>());
-
-    const get = React.useCallback(() => store.current, []);
-
-    const set = React.useCallback((value: Partial<S>) => {
-      store.current = { ...store.current, ...value };
-      subscribers.current.forEach((callback) => callback());
-    }, []);
-
-    const subscribe = React.useCallback((callback: () => void) => {
-      subscribers.current.add(callback);
-      return () => subscribers.current.delete(callback);
-    }, []);
-
-    return {
-      get,
-      set,
-      subscribe,
-    };
-  }
-
-  type UseStatesContextDataReturnType = ReturnType<typeof useStatesContextData>;
-
   const StatesContext =
     React.createContext<UseStatesContextDataReturnType | null>(null);
 
@@ -41,7 +41,7 @@ export default function context<S extends Record<keyof S, any>>(
     children,
   }: Readonly<{ children: React.ReactNode }>) {
     return (
-      <StatesContext.Provider value={useStatesContextData()}>
+      <StatesContext.Provider value={useStatesContextData(initialStates)}>
         {children}
       </StatesContext.Provider>
     );
@@ -90,21 +90,19 @@ export default function context<S extends Record<keyof S, any>>(
   }
 
   // Хук для обновления состояния по ключу или dispatch action
-  function useSetNexus(): (value: Partial<S> | A) => void {
-    const statesContext = React.useContext(StatesContext);
+  function useAction(): (action: A) => void {
+    const statesContext = React.useContext(StatesContext); // Убедитесь, что контекст правильный
 
     // Проверяем, существует ли контекст
     if (!statesContext) {
       throw new Error("NexusContextProvider not found 👺");
     }
 
-    return (value: Partial<S> | A) => {
-      if ("type" in value) {
-        const newState = reducer(statesContext.get(), value as A);
-        statesContext.set(newState);
-      } else {
-        statesContext.set(value as Partial<S>);
-      }
+    // Возвращаем функцию, которая принимает действие
+    return (action: A) => {
+      // Вызываем редьюсер и получаем новое состояние
+      const newState = reducer(statesContext.get(), action); // Обновляем состояние через редьюсер
+      statesContext.set(newState); // Устанавливаем новое состояние в контекст
     };
   }
 
@@ -126,7 +124,7 @@ export default function context<S extends Record<keyof S, any>>(
 
   return {
     useGetNexus,
-    useSetNexus,
+    useAction,
     useNexusAll,
     useSelector,
     NexusContextProvider,

@@ -1,5 +1,5 @@
 import React from "react";
-// import { useGetNexus, useSetNexus } from "../stateManager/store";
+// import { useGetNexus, useAction } from "../stateManager/store";
 
 // interface RequestState {
 //   data?: any;
@@ -11,7 +11,7 @@ export default function useRequest(requestName: string, url: string) {
 
   // const storageRequestName = JSON.parse(sessionStorage.getItem(`📌`)); // !!!
 
-  // const setNexus = useSetNexus();
+  // const setNexus = useAction();
 
   React.useEffect(() => {
     let isMounted = true;

@@ -1,9 +1,9 @@
 export type A<T = any> = {
-  actionType: ActionKey; // Используем ActionKey вместо string
+  type: ActionKey; // Используем ActionKey вместо string
   payload?: T;
 };
 
-export type ActionsMap = {
+export type ActionsType = {
   [key in ActionKey]: {
     reducer?: (state: S, action: A) => S;
   };
@@ -18,7 +18,7 @@ function createAction(reducer?: (state: S, action: A) => S) {
 }
 
 let initialStates: S = {} as S; // Инициализация как пустой объект
-let actions: ActionsMap;
+let actions: ActionsType;
 
 try {
   const config = require("../../../nexusConfig");

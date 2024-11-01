@@ -6,14 +6,12 @@ import { S, A, initialStates, actions } from "./loadUserConfig";
 // Создаём контекст с типом состояния S
 type NexusContextType = {
   useGetNexus: <K extends keyof S>(stateName: K) => S[K];
-  useSetNexus: () => ({ actionType, payload }: A) => void;
+  useAction: () => ({ type, payload }: A) => void;
   useNexusAll: () => S;
   useSelector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
 };
 
-const NexusContext = React.createContext<NexusContextType | undefined>(
-  undefined
-);
+const NexusContext = React.createContext<NexusContextType | null>(null);
 
 // NexusProvider принимает конфигурацию состояний и редьюсера
 const NexusProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -29,7 +27,7 @@ const NexusProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const contextValue: NexusContextType = {
     useGetNexus: Nexus.useGetNexus,
-    useSetNexus: Nexus.useSetNexus,
+    useAction: Nexus.useAction,
     useNexusAll: Nexus.useNexusAll,
     useSelector: Nexus.useSelector,
   };
@@ -63,9 +61,9 @@ const useSelector = <K extends keyof S>(selector: (state: S) => S[K]): S[K] => {
 };
 
 // Хук для изменения состояния
-const useSetNexus = () => {
+const useAction = () => {
   const ctx = contextExist();
-  return ctx.useSetNexus();
+  return ctx.useAction();
 };
 
-export { useGetNexus, useSetNexus, useSelector, NexusProvider };
+export { useGetNexus, useAction, useSelector, NexusProvider };

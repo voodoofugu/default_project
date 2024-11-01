@@ -1,8 +1,8 @@
-import { S, A, ActionsMap } from "./loadUserConfig";
+import { S, A, ActionsType } from "./loadUserConfig";
 
-export default function createReducer(actions: ActionsMap) {
+export default function createReducer(actions: ActionsType) {
   return function reducerNexus(state: S, action: A): S {
-    const actionType = action.actionType;
+    const actionType = action.type;
     const payload = action.payload;
 
     if (actions[actionType]) {

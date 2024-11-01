@@ -1,6 +1,6 @@
 import React from "react";
 import { NexusStatesT } from "../stateManager/initialStates";
-// import { useGetNexus, useSetNexus } from "../stateManager/store";
+// import { useGetNexus, useAction } from "../stateManager/store";
 
 interface StyleTagProps {
   parent: NexusStatesT["parent"];
@@ -39,7 +39,7 @@ StyleTagProps) => {
   //   [fileNames.join(",")]
   // );
 
-  // const setNexus = useSetNexus();
+  // const setNexus = useAction();
 
   // React.useEffect(() => {
   //   setNexus({
