@@ -1,4 +1,4 @@
-import { createAction } from "./src/components/stateManager/loadUserConfig";
+import { A } from "./src/components/stateManager/types";
 
 // Определение интерфейсов для состояния и действий
 interface StyleData {
@@ -26,57 +26,66 @@ export const initialStates = {
 
 // Действия
 export const actions = {
-  SOME_ACTION1: createAction(),
-  SOME_ACTION2: createAction((state, action) => ({
-    ...state,
-    ...action.payload,
-  })),
+  SOME_ACTION1: {
+    type: "SOME_ACTION1",
+    reducer: (state: any) => state, // Пустой редюсер
+  },
+  SOME_ACTION2: {
+    type: "SOME_ACTION2",
+    reducer: (state: any, action: A) => ({
+      ...state,
+      ...action.payload,
+    }),
+  },
 
-  STYLE_DATA: createAction((state, action) => {
-    if (action.payload) {
-      const { parent, fileNames, stylesLoaded } = action.payload;
-      const existingIndex = state.styleData.findIndex(
-        (item: StyleData) => item.parent === parent
-      );
+  STYLE_DATA: {
+    type: "STYLE_DATA",
+    reducer: (state: any, action: A) => {
+      if (action.payload) {
+        const { parent, fileNames, stylesLoaded } = action.payload;
+        const existingIndex = state.styleData.findIndex(
+          (item: StyleData) => item.parent === parent
+        );
 
-      const newStyleData = [...state.styleData];
+        const newStyleData = [...state.styleData];
 
-      if ("fileNames" in action.payload) {
-        // push/update
-        if (existingIndex !== -1) {
-          newStyleData[existingIndex] = {
-            ...newStyleData[existingIndex],
-            fileNames,
-          };
+        if ("fileNames" in action.payload) {
+          // push/update
+          if (existingIndex !== -1) {
+            newStyleData[existingIndex] = {
+              ...newStyleData[existingIndex],
+              fileNames,
+            };
+          } else {
+            newStyleData.push({
+              parent: parent,
+              fileNames: fileNames,
+              stylesLoaded: false,
+            });
+          }
+        } else if ("stylesLoaded" in action.payload) {
+          // loading
+          if (existingIndex !== -1) {
+            newStyleData[existingIndex] = {
+              ...newStyleData[existingIndex],
+              stylesLoaded,
+            };
+          }
         } else {
-          newStyleData.push({
-            parent: parent,
-            fileNames: fileNames,
-            stylesLoaded: false,
-          });
+          // clear
+          if (existingIndex !== -1) {
+            newStyleData.splice(existingIndex, 1);
+          }
         }
-      } else if ("stylesLoaded" in action.payload) {
-        // loading
-        if (existingIndex !== -1) {
-          newStyleData[existingIndex] = {
-            ...newStyleData[existingIndex],
-            stylesLoaded,
-          };
-        }
-      } else {
-        // clear
-        if (existingIndex !== -1) {
-          newStyleData.splice(existingIndex, 1);
-        }
-      }
 
-      return {
-        ...state,
-        styleData: newStyleData,
-      };
-    }
-    return state;
-  }),
+        return {
+          ...state,
+          styleData: newStyleData,
+        };
+      }
+      return state;
+    },
+  },
 
   // REQUEST_DATA: {
   //   reducer(state, action) {
@@ -116,18 +125,27 @@ export const actions = {
   //   },
   // },
 
-  UPDATE_INPUT1: createAction((state, action) => ({
-    ...state,
-    value1: action.payload,
-  })),
+  UPDATE_INPUT1: {
+    type: "UPDATE_INPUT1",
+    reducer: (state: any, action: A) => ({
+      ...state,
+      value1: action.payload,
+    }),
+  },
 
-  UPDATE_INPUT2: createAction((state, action) => ({
-    ...state,
-    value2: action.payload,
-  })),
+  UPDATE_INPUT2: {
+    type: "UPDATE_INPUT2",
+    reducer: (state: any, action: A) => ({
+      ...state,
+      value2: action.payload,
+    }),
+  },
 
-  INCREMENT: createAction((state) => ({
-    ...state,
-    value2: state.value2 + 1,
-  })),
+  INCREMENT: {
+    type: "INCREMENT",
+    reducer: (state: any) => ({
+      ...state,
+      value2: state.value2 + 1,
+    }),
+  },
 };

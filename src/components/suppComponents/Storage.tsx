@@ -1,7 +1,7 @@
 import React from "react";
 
 // import { useNexusAll } from "nexus-state";
-import { useGetNexus } from "../stateManager/store";
+import { useNexus } from "../stateManager/nexus";
 
 export interface watchType {
   watch?: boolean;
@@ -10,7 +10,7 @@ export interface watchType {
 export default function Storage({
   watch,
 }: watchType): React.ReactElement | null {
-  const states = useGetNexus();
+  const states = useNexus();
   const isEmpty = (obj: Record<string, unknown>): boolean => {
     return Object.keys(obj).length === 0;
   };

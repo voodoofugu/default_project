@@ -1,12 +1,11 @@
 import React from "react";
 
 // import { useAction } from "nexus-state";
-import { useAction, useSelector } from "../stateManager/store";
+import { nexusDispatch, useSelector } from "../stateManager/nexus";
 
 export default function SomeComponent2(): React.ReactElement {
   // const value1 = useGetNexus<string>("value1");
   // const value2 = useGetNexus<string>("value2");
-  const setNexus = useAction();
 
   // const handleChange2 = (e: any) => {
   //   setNexus({
@@ -20,7 +19,7 @@ export default function SomeComponent2(): React.ReactElement {
   ) as number;
 
   const increment = () => {
-    setNexus({
+    nexusDispatch({
       type: "INCREMENT",
     });
   };

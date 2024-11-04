@@ -1,7 +1,7 @@
 import React from "react";
 
 // import { NexusProvider } from "nexus-state";
-import { NexusProvider } from "./stateManager/store";
+import { NexusProvider } from "./stateManager/nexus";
 
 // import { initialStates, actions } from "./../../nexusConfig";
 

@@ -1,16 +1,16 @@
 import React from "react";
 
-// import { useGetNexus, useAction } from "nexus-state";
-import { useGetNexus, useAction } from "../stateManager/store";
+// import { useNexus, useAction } from "nexus-state";
+import { useNexus, nexusDispatch } from "../stateManager/nexus";
 // import { NexusStatesT } from "../../../nexusConfig";
 
 export default function SomeComponent1(): React.ReactElement {
-  const value1 = useGetNexus("value1");
+  const value1 = useNexus("value1");
 
-  const setNexus = useAction();
+  // const setNexus = useAction();
 
   const handleChange1 = (e: any) => {
-    setNexus({
+    nexusDispatch({
       type: "UPDATE_INPUT1",
       payload: e.target.value,
     });
