@@ -14,7 +14,7 @@ export default function SomeComponent2(): React.ReactElement {
   //   });
   // };
 
-  const useSelectorValue = useSelector(
+  const selectorValue = useSelector(
     (state) => state.value1 + state.value2
   ) as number;
 
@@ -32,7 +32,7 @@ export default function SomeComponent2(): React.ReactElement {
         <button onClick={increment}> Increment</button>
       </div>
 
-      <p>useSelector value: {useSelectorValue}</p>
+      <p>useSelector value: {selectorValue}</p>
     </>
   );
 }

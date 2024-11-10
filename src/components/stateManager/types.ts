@@ -1,23 +1,26 @@
-import { initialStates, actions } from "../../../nexusConfig";
-
-export type S = typeof initialStates;
-type ActionKey = keyof typeof actions;
-
-export type A<T = any> = {
-  type: ActionKey;
-  payload?: T;
-};
+declare global {
+  interface StatesT {}
+  interface ActionsT {}
+}
 
 export type ActionsType = {
-  [key in ActionKey]: {
-    reducer?: (state: S, action: A) => S;
+  type: keyof ActionsT;
+  payload?: any;
+};
+
+export type ActionsRT = {
+  [key in keyof ActionsT]: {
+    reducer?: (state: StatesT, action: ActionsType) => StatesT;
   };
 };
 
-export type NexusContextType = {
-  get: <K extends keyof S>(stateName: K) => S[K];
-  dispatch: ({ type, payload }: A) => void;
-  getAll: () => S;
-  selector: <K extends keyof S>(selector: (state: S) => S[K]) => S[K];
+export type NexusContextT = {
+  get: <K extends keyof StatesT>(stateName: K) => StatesT[K];
+  dispatch: ({ type, payload }: ActionsType) => void;
+  getAll: () => StatesT;
+  selector: <K extends keyof StatesT>(
+    selector: (state: StatesT) => StatesT[K]
+  ) => StatesT[K];
   subscribe: (callback: () => void) => () => void;
+  initialStates: StatesT;
 };

@@ -11,13 +11,12 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./src/types"] // Указываем только нужные папки для типов
   },
   "ts-node": {
     "compilerOptions": {
-      "module": "CommonJS",
-      "typeRoots": ["./node_modules/@types", "./src"]
+      "module": "CommonJS"
     }
-  },
-  "include": ["./src"]
+  }
 }

@@ -1,10 +1,8 @@
 import React from "react";
-import { S, A, ActionsType, NexusContextType } from "./types";
-import { initialStates, actions } from "../../../nexusConfig";
+import { ActionsType, ActionsRT, NexusContextT } from "./types";
 
-// Менеджер состояния
-export default function createReducer(actions: ActionsType) {
-  return function reducerNexus(state: S, action: A): S {
+export default function createReducer(actions: ActionsRT) {
+  return function reducerNexus(state: StatesT, action: ActionsType): StatesT {
     const actionType = action.type;
     const payload = action.payload;
 
@@ -17,7 +15,7 @@ export default function createReducer(actions: ActionsType) {
         return {
           ...state,
           ...payload,
-        } as S;
+        } as StatesT;
       }
     }
 
@@ -25,16 +23,16 @@ export default function createReducer(actions: ActionsType) {
   };
 }
 
-function getContextMethods(initialStates: S): {
-  get: () => S;
-  set: (value: Partial<S>) => void;
+function getContextMethods(initialStates: StatesT): {
+  get: () => StatesT;
+  set: (value: Partial<StatesT>) => void;
   subscribe: (callback: () => void) => () => void;
 } {
   const store = React.useRef(initialStates);
   const subscribers = React.useRef(new Set<() => void>());
 
   const get = React.useCallback(() => store.current, []);
-  const set = React.useCallback((value: Partial<S>) => {
+  const set = React.useCallback((value: Partial<StatesT>) => {
     store.current = { ...store.current, ...value };
     subscribers.current.forEach((callback) => callback());
   }, []);
@@ -52,12 +50,12 @@ function getContextMethods(initialStates: S): {
 
 // Создание значений контекста
 function createContextValue(
-  initialStates: S,
-  reducer: (state: S, action: A) => S
+  initialStates: StatesT,
+  reducer: (state: StatesT, action: ActionsType) => StatesT
 ) {
   const stateData = getContextMethods(initialStates);
 
-  function get<K extends keyof S>(stateName: K): S[K] {
+  function get<K extends keyof StatesT>(stateName: K): StatesT[K] {
     if (!(stateName in stateData.get())) {
       console.error(`State "${String(stateName)}" in useNexus not found 👺`);
     }
@@ -69,7 +67,9 @@ function createContextValue(
     );
   }
 
-  function selector<K extends keyof S>(select: (state: S) => S[K]): S[K] {
+  function selector<K extends keyof StatesT>(
+    select: (state: StatesT) => StatesT[K]
+  ): StatesT[K] {
     const state = stateData.get();
     if (select(state) === undefined) {
       console.error("State in useSelector not found 👺");
@@ -82,7 +82,7 @@ function createContextValue(
     );
   }
 
-  function dispatch(action: A): void {
+  function dispatch(action: ActionsType): void {
     const currentState = stateData.get();
     const newState = reducer(currentState, action);
     if (currentState !== newState) {
@@ -90,7 +90,7 @@ function createContextValue(
     }
   }
 
-  function getAll(): S {
+  function getAll(): StatesT {
     return React.useSyncExternalStore(
       stateData.subscribe,
       stateData.get,
@@ -108,12 +108,20 @@ function createContextValue(
 }
 
 // Создание контекста
-const NexusContext = React.createContext<NexusContextType | null>(null);
+const NexusContext = React.createContext<NexusContextT | null>(null);
 
-let nexusDispatchRef: ((action: A) => void) | null = null;
-function NexusProvider({ children }: { children: React.ReactNode }) {
+let nexusDispatchRef: ((action: ActionsType) => void) | null = null;
+const NexusProvider: React.FC<{
+  initialStates: StatesT;
+  actions: ActionsRT;
+  children: React.ReactNode;
+}> = ({ initialStates, actions, children }) => {
   const reducer = createReducer(actions);
-  const contextValue = createContextValue(initialStates, reducer);
+  const contextValue = {
+    ...createContextValue(initialStates, reducer),
+    initialStates, // добавляем initialStates в контекст
+  };
+
   nexusDispatchRef = contextValue.dispatch;
 
   return (
@@ -121,10 +129,10 @@ function NexusProvider({ children }: { children: React.ReactNode }) {
       {children}
     </NexusContext.Provider>
   );
-}
+};
 
 // Функция проверки существования контекста
-function contextExist(): NexusContextType {
+function contextExist(): NexusContextT {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
     throw new Error("NexusProvider not found 👺");
@@ -133,28 +141,29 @@ function contextExist(): NexusContextType {
 }
 
 // Хуки
-function useNexus<K extends keyof S>(stateName: K): S[K];
-function useNexus(): S;
-function useNexus(stateName?: keyof S) {
+function useNexus<K extends keyof StatesT>(stateName: K): StatesT[K];
+function useNexus(): StatesT;
+function useNexus(stateName?: keyof StatesT) {
   const ctx = contextExist();
   return stateName ? ctx.get(stateName) : ctx.getAll();
 }
 
-const useSelector = <K extends keyof S>(selector: (state: S) => S[K]): S[K] => {
+const useSelector = <K extends keyof StatesT>(
+  selector: (state: StatesT) => StatesT[K]
+): StatesT[K] => {
   const ctx = contextExist();
 
-  // Кэшируем функцию селектора
   const memoizedSelector = React.useCallback(selector, [selector]);
 
   return React.useSyncExternalStore(
     ctx.subscribe,
     () => memoizedSelector(ctx.getAll()),
-    () => memoizedSelector(initialStates)
+    () => memoizedSelector(ctx.initialStates)
   );
 };
 
 // functions
-function nexusDispatch(action: A): void {
+function nexusDispatch(action: { type: keyof ActionsT; payload?: any }): void {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
@@ -163,7 +172,9 @@ function nexusDispatch(action: A): void {
   nexusDispatchRef(action);
 }
 
-function createAction(reducer?: (state: S, action: A) => S) {
+function createAction(
+  reducer?: (state: StatesT, action: ActionsType) => StatesT
+) {
   return { reducer };
 }
 

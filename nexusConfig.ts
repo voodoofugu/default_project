@@ -1,4 +1,4 @@
-import { A } from "./src/components/stateManager/types";
+import { createAction } from "./src/components/stateManager/nexus";
 
 // Определение интерфейсов для состояния и действий
 interface StyleData {
@@ -12,140 +12,130 @@ interface PokemonState {
   requestLoaded: boolean;
 }
 
+type InitialStatesT = typeof initialStates;
+type InitialActionsT = typeof actions;
+
+declare global {
+  interface StatesT extends InitialStatesT {}
+  interface ActionsT extends InitialActionsT {}
+}
+
 // Начальное состояние
 export const initialStates = {
-  value1: 1,
-  value2: 2,
-  value3: "3",
-  value4: "4",
+  value1: "",
+  value2: 0,
+  value3: "",
+  value4: "",
   styleData: [] as StyleData[],
   pokemon1_s: { data: null, requestLoaded: false } as PokemonState,
   pokemon2_s: { data: null, requestLoaded: false } as PokemonState,
   value2_l: false,
 };
 
+const UPDATE_INPUT1 = createAction((state, action) => ({
+  ...state,
+  value1: action.payload,
+}));
+const INCREMENT = createAction((state) => ({
+  ...state,
+  value2: state.value2 + 1,
+}));
+
 // Действия
 export const actions = {
-  SOME_ACTION1: {
-    type: "SOME_ACTION1",
-    reducer: (state: any) => state, // Пустой редюсер
-  },
-  SOME_ACTION2: {
-    type: "SOME_ACTION2",
-    reducer: (state: any, action: A) => ({
-      ...state,
-      ...action.payload,
-    }),
-  },
+  SOME_ACTION2: createAction((state, action) => ({
+    ...state,
+    ...action.payload,
+  })),
 
-  STYLE_DATA: {
-    type: "STYLE_DATA",
-    reducer: (state: any, action: A) => {
-      if (action.payload) {
-        const { parent, fileNames, stylesLoaded } = action.payload;
-        const existingIndex = state.styleData.findIndex(
-          (item: StyleData) => item.parent === parent
-        );
+  STYLE_DATA: createAction((state, action) => {
+    if (action.payload) {
+      const { parent, fileNames, stylesLoaded } = action.payload;
+      const existingIndex = state.styleData.findIndex(
+        (item: StyleData) => item.parent === parent
+      );
 
-        const newStyleData = [...state.styleData];
+      const newStyleData = [...state.styleData];
 
-        if ("fileNames" in action.payload) {
-          // push/update
-          if (existingIndex !== -1) {
-            newStyleData[existingIndex] = {
-              ...newStyleData[existingIndex],
-              fileNames,
-            };
-          } else {
-            newStyleData.push({
-              parent: parent,
-              fileNames: fileNames,
-              stylesLoaded: false,
-            });
-          }
-        } else if ("stylesLoaded" in action.payload) {
-          // loading
-          if (existingIndex !== -1) {
-            newStyleData[existingIndex] = {
-              ...newStyleData[existingIndex],
-              stylesLoaded,
-            };
-          }
+      if ("fileNames" in action.payload) {
+        // push/update
+        if (existingIndex !== -1) {
+          newStyleData[existingIndex] = {
+            ...newStyleData[existingIndex],
+            fileNames,
+          };
         } else {
-          // clear
-          if (existingIndex !== -1) {
-            newStyleData.splice(existingIndex, 1);
-          }
+          newStyleData.push({
+            parent: parent,
+            fileNames: fileNames,
+            stylesLoaded: false,
+          });
         }
-
-        return {
-          ...state,
-          styleData: newStyleData,
-        };
+      } else if ("stylesLoaded" in action.payload) {
+        // loading
+        if (existingIndex !== -1) {
+          newStyleData[existingIndex] = {
+            ...newStyleData[existingIndex],
+            stylesLoaded,
+          };
+        }
+      } else {
+        // clear
+        if (existingIndex !== -1) {
+          newStyleData.splice(existingIndex, 1);
+        }
       }
-      return state;
-    },
-  },
 
-  // REQUEST_DATA: {
-  //   reducer(state, action) {
-  //     if (action.payload) {
-  //       const { requestName, data, requestLoaded } = action.payload;
+      return {
+        ...state,
+        styleData: newStyleData,
+      };
+    }
+    return state;
+  }),
 
-  //       // Проверяем, что state[requestName] — это объект
-  //       const currentState = state[requestName as keyof NexusStatesT] || {};
-  //       const newRequestData: { data?: unknown; requestLoaded?: boolean } =
-  //         typeof currentState === "object" && currentState !== null
-  //           ? { ...currentState }
-  //           : {};
+  REQUEST_DATA: createAction((state, action) => {
+    if (action.payload) {
+      const { requestName, data, requestLoaded } = action.payload;
 
-  //       if (data !== undefined) {
-  //         // update
-  //         newRequestData.data = data;
-  //         if (!("requestLoaded" in newRequestData)) {
-  //           newRequestData.requestLoaded = false;
-  //         }
-  //       }
-  //       if (requestLoaded !== undefined) {
-  //         // update requestLoaded
-  //         newRequestData.requestLoaded = requestLoaded;
-  //       } else {
-  //         // clear
-  //         delete state[requestName as keyof NexusStatesT];
-  //         console.log("requestName", requestName);
-  //       }
+      // Проверяем, что state[requestName] — это объект
+      const currentState = state[requestName as keyof StatesT] || {};
+      const newRequestData: { data?: unknown; requestLoaded?: boolean } =
+        typeof currentState === "object" && currentState !== null
+          ? { ...currentState }
+          : {};
 
-  //       return {
-  //         ...state,
-  //         [requestName]: newRequestData,
-  //       };
-  //     }
+      if (data !== undefined) {
+        // update
+        newRequestData.data = data;
+        if (!("requestLoaded" in newRequestData)) {
+          newRequestData.requestLoaded = false;
+        }
+      }
+      if (requestLoaded !== undefined) {
+        // update requestLoaded
+        newRequestData.requestLoaded = requestLoaded;
+      } else {
+        // clear
+        delete state[requestName as keyof StatesT];
+        console.log("requestName", requestName);
+      }
 
-  //     return state;
-  //   },
-  // },
+      return {
+        ...state,
+        [requestName]: newRequestData,
+      };
+    }
 
-  UPDATE_INPUT1: {
-    type: "UPDATE_INPUT1",
-    reducer: (state: any, action: A) => ({
-      ...state,
-      value1: action.payload,
-    }),
-  },
+    return state;
+  }),
 
-  UPDATE_INPUT2: {
-    type: "UPDATE_INPUT2",
-    reducer: (state: any, action: A) => ({
-      ...state,
-      value2: action.payload,
-    }),
-  },
+  UPDATE_INPUT1,
 
-  INCREMENT: {
-    type: "INCREMENT",
-    reducer: (state: any) => ({
-      ...state,
-      value2: state.value2 + 1,
-    }),
-  },
+  UPDATE_INPUT2: createAction((state, action) => ({
+    ...state,
+    value2: action.payload,
+  })),
+
+  INCREMENT,
 };
