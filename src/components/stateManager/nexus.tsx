@@ -1,8 +1,11 @@
 import React from "react";
-import { ActionsType, ActionsRT, NexusContextT } from "./types";
+import { ActionsCallingT, ActionsRT, NexusContextT } from "./types";
 
 export default function createReducer(actions: ActionsRT) {
-  return function reducerNexus(state: StatesT, action: ActionsType): StatesT {
+  return function reducerNexus(
+    state: StatesT,
+    action: ActionsCallingT
+  ): StatesT {
     const actionType = action.type;
     const payload = action.payload;
 
@@ -51,7 +54,7 @@ function getContextMethods(initialStates: StatesT): {
 // Создание значений контекста
 function createContextValue(
   initialStates: StatesT,
-  reducer: (state: StatesT, action: ActionsType) => StatesT
+  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
 ) {
   const stateData = getContextMethods(initialStates);
 
@@ -82,7 +85,7 @@ function createContextValue(
     );
   }
 
-  function dispatch(action: ActionsType): void {
+  function dispatch(action: ActionsCallingT): void {
     const currentState = stateData.get();
     const newState = reducer(currentState, action);
     if (currentState !== newState) {
@@ -110,7 +113,7 @@ function createContextValue(
 // Создание контекста
 const NexusContext = React.createContext<NexusContextT | null>(null);
 
-let nexusDispatchRef: ((action: ActionsType) => void) | null = null;
+let nexusDispatchRef: ((action: ActionsCallingT) => void) | null = null;
 const NexusProvider: React.FC<{
   initialStates: StatesT;
   actions: ActionsRT;
@@ -163,7 +166,7 @@ const useSelector = <K extends keyof StatesT>(
 };
 
 // functions
-function nexusDispatch(action: { type: keyof ActionsT; payload?: any }): void {
+function nexusDispatch(action: ActionsCallingT): void {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
@@ -173,7 +176,7 @@ function nexusDispatch(action: { type: keyof ActionsT; payload?: any }): void {
 }
 
 function createAction(
-  reducer?: (state: StatesT, action: ActionsType) => StatesT
+  reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ) {
   return { reducer };
 }

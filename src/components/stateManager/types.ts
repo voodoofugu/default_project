@@ -3,20 +3,20 @@ declare global {
   interface ActionsT {}
 }
 
-export type ActionsType = {
+export type ActionsCallingT = {
   type: keyof ActionsT;
   payload?: any;
 };
 
 export type ActionsRT = {
   [key in keyof ActionsT]: {
-    reducer?: (state: StatesT, action: ActionsType) => StatesT;
+    reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
   };
 };
 
 export type NexusContextT = {
   get: <K extends keyof StatesT>(stateName: K) => StatesT[K];
-  dispatch: ({ type, payload }: ActionsType) => void;
+  dispatch: ({ type, payload }: ActionsCallingT) => void;
   getAll: () => StatesT;
   selector: <K extends keyof StatesT>(
     selector: (state: StatesT) => StatesT[K]
