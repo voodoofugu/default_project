@@ -1,23 +1,24 @@
 import React from "react";
 import { ActionsCallingT, ActionsRT, NexusContextT } from "./types";
 
-export default function createReducer(actions: ActionsRT) {
+function createReducer(actions: ActionsRT) {
   return function reducerNexus(
     state: StatesT,
     action: ActionsCallingT
   ): StatesT {
-    const actionType = action.type;
-    const payload = action.payload;
+    const actionType = action.type as keyof ActionsRT;
 
-    if (actions[actionType]) {
-      const config = actions[actionType];
+    if (actionType in actions) {
+      const config = actions[actionType] as unknown as {
+        reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+      };
 
       if (config.reducer) {
         return config.reducer(state, action);
       } else {
         return {
           ...state,
-          ...payload,
+          ...action.payload,
         } as StatesT;
       }
     }
