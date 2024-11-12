@@ -8,10 +8,13 @@ export type ActionsCallingT = {
 };
 
 export type ActionsRT = {
-  [key in keyof ActionsT]: {
-    reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
+  [key in keyof ActionsT]?: {
+    reducer: Exclude<
+      (state: StatesT, action: ActionsCallingT) => StatesT,
+      undefined
+    >;
   };
-} & Record<string, never>;
+};
 
 export type NexusContextT = {
   get: <K extends keyof StatesT>(stateName: K) => StatesT[K];

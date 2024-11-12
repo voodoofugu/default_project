@@ -179,7 +179,9 @@ function nexusDispatch(action: ActionsCallingT): void {
 function createAction(
   reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ) {
-  return { reducer };
+  return {
+    reducer: reducer || ((state: StatesT) => state),
+  };
 }
 
 export { NexusProvider, useNexus, useSelector, nexusDispatch, createAction };
