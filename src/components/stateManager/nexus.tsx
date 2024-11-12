@@ -120,9 +120,11 @@ const NexusProvider: React.FC<{
   actions: ActionsRT;
   children: React.ReactNode;
 }> = ({ initialStates, actions, children }) => {
+  const immutableInitialStates = structuredClone(initialStates);
   const reducer = createReducer(actions);
+
   const contextValue = {
-    ...createContextValue(initialStates, reducer),
+    ...createContextValue(immutableInitialStates, reducer),
     initialStates, // добавляем initialStates в контекст
   };
 
