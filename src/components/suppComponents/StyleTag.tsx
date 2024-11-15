@@ -1,20 +1,21 @@
 import React from "react";
-import { NexusStatesT } from "../stateManager/initialStates";
-// import { useGetNexus, useAction } from "../stateManager/store";
+import { useNexus, nexusDispatch } from "../../../nexus-state/src/nexus";
+
+import { StyleData } from "../../../nexus/nexusConfig";
 
 interface StyleTagProps {
-  parent: NexusStatesT["parent"];
-  fileNames: NexusStatesT["fileNames"];
-  children?: React.ReactNode;
+  parent: StyleData["parent"];
+  fileNames: StyleData["fileNames"];
   loadingElement?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export const styleLoading = ({
+const styleLoading = ({
   parent,
   styleData,
 }: {
   parent: StyleTagProps["parent"];
-  styleData: NexusStatesT["styleData"];
+  styleData: StyleData[];
 }) => {
   let stylesLoaded = false;
   styleData.forEach((styleObj) => {
@@ -26,50 +27,41 @@ export const styleLoading = ({
   return stylesLoaded ? true : false;
 };
 
-const StyleTag = ({
-  // parent,
-  // fileNames,
-  children,
-}: // loadingElement,
-StyleTagProps) => {
-  // const styleData = useGetNexus("styleData");
+const StyleTag = ({ parent, fileNames, children }: StyleTagProps) => {
+  const styleData = useNexus("styleData");
 
-  // const memoizedFileNames = React.useMemo(
-  //   () => fileNames,
-  //   [fileNames.join(",")]
-  // );
+  const memoizedFileNames = React.useMemo(
+    () => fileNames,
+    [fileNames.join(",")]
+  );
 
-  // const setNexus = useAction();
+  React.useEffect(() => {
+    nexusDispatch({
+      type: "STYLE_DATA",
+      payload: {
+        parent: parent,
+        fileNames: memoizedFileNames,
+      },
+    });
+  }, [parent, memoizedFileNames]);
 
-  // React.useEffect(() => {
-  //   setNexus({
-  //     type: "STYLE_DATA",
-  //     payload: {
-  //       parent: parent,
-  //       fileNames: memoizedFileNames,
-  //     },
-  //   });
-  // }, [parent, memoizedFileNames]);
-
-  // React.useEffect(() => {
-  //   return () => {
-  //     setNexus({
-  //       type: "STYLE_DATA",
-  //       payload: {
-  //         parent: parent,
-  //       },
-  //     });
-  //   };
-  // }, [parent]);
+  React.useEffect(() => {
+    return () => {
+      nexusDispatch({
+        type: "STYLE_DATA",
+        payload: {
+          parent: parent,
+        },
+      });
+    };
+  }, [parent]);
 
   if (children) {
     return (
       <>
-        {/* {styleLoading({ parent: parent, styleData: styleData })
+        {styleLoading({ parent: parent, styleData: styleData })
           ? children
-          : loadingElement
-          ? loadingElement
-          : null} */}
+          : null}
       </>
     );
   } else {

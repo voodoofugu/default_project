@@ -1,16 +1,10 @@
 import React from "react";
-import { NexusStatesT } from "../stateManager/initialStates";
+import { nexusDispatch } from "../../../nexus-state/src/nexus";
+
+import { StyleData } from "../../../nexus/nexusConfig";
 import textToCamelcase from "../../scripts/textToCamelcase";
 
-export interface DynamicStyleArray {
-  styleData: NexusStatesT["styleData"];
-  setStyleData: (value: { type: string; payload: any }) => void;
-}
-
-export const clearStyles = ({
-  parent,
-  fileNames,
-}: NexusStatesT["styleData"][0]) => {
+export const clearStyles = ({ parent, fileNames }: StyleData) => {
   const argsForRemove = document.head.querySelectorAll(`[${parent}="⚡"]`);
   const idsForRemove = Array.from(argsForRemove).map((el) => el.id);
 
@@ -26,7 +20,7 @@ export const clearStyles = ({
   });
 };
 
-export const createStateTag = (parent: string, fileName: string) => {
+const createStateTag = (parent: string, fileName: string) => {
   const id = textToCamelcase(fileName);
   let styleElement = document.getElementById(id) as HTMLStyleElement;
   if (!styleElement) {
@@ -38,8 +32,8 @@ export const createStateTag = (parent: string, fileName: string) => {
   return styleElement;
 };
 
-export const loadStyles = async (
-  { parent, fileNames, stylesLoaded }: NexusStatesT["styleData"][0],
+const loadStyles = async (
+  { parent, fileNames, stylesLoaded }: StyleData,
   onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
   if (
@@ -68,8 +62,8 @@ export const loadStyles = async (
   }
 };
 
-const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
-  const prevStyleArrayRef = React.useRef<NexusStatesT["styleData"]>([]);
+const useDynamicStyle = (styleData: StyleData[]) => {
+  const prevStyleArrayRef = React.useRef<StyleData[]>([]);
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
   const handleStyleLoad = (
@@ -77,6 +71,7 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
     totalFiles: number,
     stylesLoaded: boolean
   ) => {
+    console.log("handleStyleLoad");
     if (loadedFilesRef.current.loadedFiles === 0) {
       loadedFilesRef.current = { loadedFiles: 0 };
     }
@@ -87,7 +82,7 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
       totalFiles === 0 ||
       (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
     ) {
-      setStyleData({
+      nexusDispatch({
         type: "STYLE_DATA",
         payload: {
           parent: parent,
@@ -113,7 +108,7 @@ const useDynamicStyle = ({ styleData, setStyleData }: DynamicStyleArray) => {
     }
   }, [styleData]);
 
-  const loadStyleArray = (styleData: NexusStatesT["styleData"]) => {
+  const loadStyleArray = (styleData: StyleData[]) => {
     styleData.forEach((styleObj) => {
       const prevParent = prevStyleArrayRef.current.find(
         (s) => s.parent === styleObj.parent

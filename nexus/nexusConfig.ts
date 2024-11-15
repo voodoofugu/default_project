@@ -1,10 +1,11 @@
 import { createAction } from "../nexus-state/src/nexus";
 
 // Определение интерфейсов для состояния и действий
-interface StyleData {
+export interface StyleData {
   parent: string;
   fileNames: string[];
-  stylesLoaded: boolean;
+  totalFiles?: number;
+  stylesLoaded?: boolean;
 }
 
 interface PokemonState {
