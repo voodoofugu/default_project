@@ -1,0 +1,3 @@
+[submodule "nexus-state"]
+	path = nexus-state
+	url = https://github.com/voodoofugu/nexus-state.git

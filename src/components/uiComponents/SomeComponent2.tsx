@@ -1,7 +1,6 @@
 import React from "react";
 
-// import { useAction } from "nexus-state";
-import { nexusDispatch, useSelector } from "../stateManager/nexus";
+import { useSelector, nexusDispatch } from "../../../nexus-state/src/nexus";
 
 export default function SomeComponent2(): React.ReactElement {
   // const value1 = useGetNexus<string>("value1");

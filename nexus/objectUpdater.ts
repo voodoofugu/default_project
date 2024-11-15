@@ -3,6 +3,7 @@ type S = keyof typeof iStates;
 
 const iStates = {};
 
+// function add or update {}
 function iStatesNew(keyToAdd?: NewST, keyToDelete?: S): NewST {
   const newObj: NewST = { ...iStates };
 

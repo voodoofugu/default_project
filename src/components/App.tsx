@@ -1,9 +1,9 @@
 import React from "react";
 
 // import { NexusProvider } from "nexus-state";
-import { NexusProvider } from "./stateManager/nexus";
+import { NexusProvider } from "../../nexus-state/src/nexus";
 
-import { initialStates, actions } from "./../../nexusConfig";
+import { initialStates, actions } from "../../nexus/nexusConfig";
 
 // import StyleTagCore from "./suppComponents/StyleTagCore";
 import Main from "./pageComponents/Main";

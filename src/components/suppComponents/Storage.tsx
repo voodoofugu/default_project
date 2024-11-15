@@ -1,5 +1,6 @@
 import React from "react";
-import { useNexus } from "../stateManager/nexus";
+
+import { useNexus } from "../../../nexus-state/src/nexus";
 
 export interface watchType {
   watch?: boolean;

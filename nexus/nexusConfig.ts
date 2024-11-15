@@ -1,4 +1,4 @@
-import { createAction } from "./src/components/stateManager/nexus";
+import { createAction } from "../nexus-state/src/nexus";
 
 // Определение интерфейсов для состояния и действий
 interface StyleData {
