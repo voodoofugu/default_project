@@ -1,25 +1,24 @@
 import React from "react";
 import { useNexus, nexusDispatch } from "../../../nexus-state/src/nexus";
 
-import { StyleData } from "../../../nexus/nexusConfig";
+import { StyleData } from "../../../nexus/actions/STYLE_DATA";
 
 interface StyleTagProps {
-  parent: StyleData["parent"];
   fileNames: StyleData["fileNames"];
   loadingElement?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const styleLoading = ({
-  parent,
+  id,
   styleData,
 }: {
-  parent: StyleTagProps["parent"];
+  id: string;
   styleData: StyleData[];
 }) => {
   let stylesLoaded = false;
   styleData.forEach((styleObj) => {
-    if (styleObj.parent === parent) {
+    if (styleObj.id === id) {
       stylesLoaded = styleObj.stylesLoaded ?? false;
     }
   });
@@ -27,46 +26,34 @@ const styleLoading = ({
   return stylesLoaded ? true : false;
 };
 
-const StyleTag = ({ parent, fileNames, children }: StyleTagProps) => {
+const StyleTag = ({ fileNames, children }: StyleTagProps) => {
+  const id = React.useId();
   const styleData = useNexus("styleData");
 
-  const memoizedFileNames = React.useMemo(
-    () => fileNames,
-    [fileNames.join(",")]
-  );
+  const memoizedFileNames = React.useMemo(() => fileNames, [fileNames]);
 
   React.useEffect(() => {
     nexusDispatch({
       type: "STYLE_DATA",
       payload: {
-        parent: parent,
+        id: id,
         fileNames: memoizedFileNames,
       },
     });
-  }, [parent, memoizedFileNames]);
 
-  React.useEffect(() => {
     return () => {
       nexusDispatch({
         type: "STYLE_DATA",
         payload: {
-          parent: parent,
+          id: id,
         },
       });
     };
-  }, [parent]);
+  }, [memoizedFileNames]);
 
-  if (children) {
-    return (
-      <>
-        {styleLoading({ parent: parent, styleData: styleData })
-          ? children
-          : null}
-      </>
-    );
-  } else {
-    return null;
-  }
+  const stylesLoaded = styleLoading({ id, styleData });
+
+  return stylesLoaded ? <>{children}</> : null;
 };
 
 export default StyleTag;

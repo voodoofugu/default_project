@@ -1,12 +1,5 @@
-import { createAction } from "../nexus-state/src/nexus";
-
-// Определение интерфейсов для состояния и действий
-export interface StyleData {
-  parent: string;
-  fileNames: string[];
-  totalFiles?: number;
-  stylesLoaded?: boolean;
-}
+import { nexusAction } from "../nexus-state/src/nexus";
+import STYLE_DATA, { StyleData } from "./actions/STYLE_DATA";
 
 interface PokemonState {
   data: unknown | null;
@@ -33,69 +26,25 @@ export const initialStates = {
   value2_l: false,
 };
 
-const UPDATE_INPUT1 = createAction((state, action) => ({
+const UPDATE_INPUT1 = nexusAction((state, action) => ({
   ...state,
   value1: action.payload,
 }));
-const INCREMENT = createAction((state) => ({
+const INCREMENT = nexusAction((state) => ({
   ...state,
   value2: state.value2 + 1,
 }));
 
 // Действия
 export const actions = {
-  SOME_ACTION2: createAction((state, action) => ({
+  SOME_ACTION2: nexusAction((state, action) => ({
     ...state,
     ...action.payload,
   })),
 
-  STYLE_DATA: createAction((state, action) => {
-    if (action.payload) {
-      const { parent, fileNames, stylesLoaded } = action.payload;
-      const existingIndex = state.styleData.findIndex(
-        (item: StyleData) => item.parent === parent
-      );
+  STYLE_DATA,
 
-      const newStyleData = [...state.styleData];
-
-      if ("fileNames" in action.payload) {
-        // push/update
-        if (existingIndex !== -1) {
-          newStyleData[existingIndex] = {
-            ...newStyleData[existingIndex],
-            fileNames,
-          };
-        } else {
-          newStyleData.push({
-            parent: parent,
-            fileNames: fileNames,
-            stylesLoaded: false,
-          });
-        }
-      } else if ("stylesLoaded" in action.payload) {
-        // loading
-        if (existingIndex !== -1) {
-          newStyleData[existingIndex] = {
-            ...newStyleData[existingIndex],
-            stylesLoaded,
-          };
-        }
-      } else {
-        // clear
-        if (existingIndex !== -1) {
-          newStyleData.splice(existingIndex, 1);
-        }
-      }
-
-      return {
-        ...state,
-        styleData: newStyleData,
-      };
-    }
-    return state;
-  }),
-
-  REQUEST_DATA: createAction((state, action) => {
+  REQUEST_DATA: nexusAction((state, action) => {
     if (action.payload) {
       const { requestName, data, requestLoaded } = action.payload;
 
@@ -133,7 +82,7 @@ export const actions = {
 
   UPDATE_INPUT1,
 
-  UPDATE_INPUT2: createAction((state, action) => ({
+  UPDATE_INPUT2: nexusAction((state, action) => ({
     ...state,
     value2: action.payload,
   })),

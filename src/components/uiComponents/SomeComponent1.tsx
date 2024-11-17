@@ -15,7 +15,7 @@ export default function SomeComponent1(): React.ReactElement {
 
   return (
     <>
-      <StyleTag parent="hi" fileNames={["hi"]} />
+      <StyleTag fileNames={["hi"]} />
       <div>
         <input type="text" value={value1 || ""} onChange={handleChange1} />
         <p>Current input value: {value1}</p>

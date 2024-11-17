@@ -1,11 +1,13 @@
 import React from "react";
 import { nexusDispatch } from "../../../nexus-state/src/nexus";
 
-import { StyleData } from "../../../nexus/nexusConfig";
 import textToCamelcase from "../../scripts/textToCamelcase";
+import { StyleData } from "../../../nexus/actions/STYLE_DATA";
 
-export const clearStyles = ({ parent, fileNames }: StyleData) => {
-  const argsForRemove = document.head.querySelectorAll(`[${parent}="⚡"]`);
+export const clearStyles = ({ id, fileNames }: StyleData) => {
+  console.log("clearStyles");
+  const escapedId = CSS.escape(id);
+  const argsForRemove = document.head.querySelectorAll(`[id="${escapedId}"]`);
   const idsForRemove = Array.from(argsForRemove).map((el) => el.id);
 
   idsForRemove.forEach((id) => {
@@ -20,39 +22,40 @@ export const clearStyles = ({ parent, fileNames }: StyleData) => {
   });
 };
 
-const createStateTag = (parent: string, fileName: string) => {
-  const id = textToCamelcase(fileName);
+const createStateTag = (id: string, fileName: string) => {
+  const idElement = textToCamelcase(fileName);
   let styleElement = document.getElementById(id) as HTMLStyleElement;
   if (!styleElement) {
     styleElement = document.createElement("style");
-    styleElement.id = id;
-    styleElement.setAttribute(`${parent}`, "⚡");
+    styleElement.id = idElement;
+    styleElement.setAttribute("id", `${id}`);
     document.head.appendChild(styleElement);
   }
   return styleElement;
 };
 
 const loadStyles = async (
-  { parent, fileNames, stylesLoaded }: StyleData,
-  onLoad: (parent: string, totalFiles: number, stylesLoaded: boolean) => void
+  { id, fileNames, stylesLoaded }: StyleData,
+  onLoad: (id: string, totalFiles: number, stylesLoaded: boolean) => void
 ) => {
+  console.log("loadStyles");
   if (
     fileNames &&
     typeof stylesLoaded === "boolean" &&
     fileNames.length === 0
   ) {
-    onLoad(parent, 0, stylesLoaded);
-    console.log(`🚫 Array with the parent "${parent}" is empty`);
-  } else if (fileNames && stylesLoaded) {
+    onLoad(id, 0, stylesLoaded);
+    console.log(`🚫 Array with the id "${id}" is empty`);
+  } else if (fileNames && typeof stylesLoaded === "boolean") {
     for (const fileName of fileNames) {
-      const styleElement = createStateTag(parent, fileName);
+      const styleElement = createStateTag(id, fileName);
       try {
         const { default: text } = await import(
           `../../style/css/${fileName}.css`
         );
         styleElement.textContent = text;
         if (styleElement.textContent && styleElement.textContent.length > 0) {
-          onLoad(parent, fileNames.length, stylesLoaded);
+          onLoad(id, fileNames.length, stylesLoaded);
         }
       } catch (error) {
         console.error(`🚫 Error loading style for ${fileName}:`, error);
@@ -67,17 +70,14 @@ const useDynamicStyle = (styleData: StyleData[]) => {
   const loadedFilesRef = React.useRef({ loadedFiles: 0 });
 
   const handleStyleLoad = (
-    parent: string,
+    id: string,
     totalFiles: number,
     stylesLoaded: boolean
   ) => {
-    console.log("handleStyleLoad");
-    if (loadedFilesRef.current.loadedFiles === 0) {
-      loadedFilesRef.current = { loadedFiles: 0 };
-    }
     if (loadedFilesRef.current.loadedFiles < totalFiles) {
       loadedFilesRef.current.loadedFiles += 1;
     }
+
     if (
       totalFiles === 0 ||
       (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
@@ -85,7 +85,7 @@ const useDynamicStyle = (styleData: StyleData[]) => {
       nexusDispatch({
         type: "STYLE_DATA",
         payload: {
-          parent: parent,
+          id: id,
           stylesLoaded: true,
         },
       });
@@ -103,7 +103,7 @@ const useDynamicStyle = (styleData: StyleData[]) => {
   React.useEffect(() => {
     emptyStyleArray();
 
-    if (styleData.length > 0) {
+    if (styleData && styleData.length > 0) {
       loadStyleArray(styleData);
     }
   }, [styleData]);
@@ -111,7 +111,7 @@ const useDynamicStyle = (styleData: StyleData[]) => {
   const loadStyleArray = (styleData: StyleData[]) => {
     styleData.forEach((styleObj) => {
       const prevParent = prevStyleArrayRef.current.find(
-        (s) => s.parent === styleObj.parent
+        (s) => s.id === styleObj.id
       );
 
       let removedFileNames: string[] = [];
@@ -128,7 +128,7 @@ const useDynamicStyle = (styleData: StyleData[]) => {
           const removedObjects = prevStyleArrayRef.current.filter(
             (prevParent) => {
               return !styleData.some(
-                (styleObj) => styleObj.parent === prevParent.parent
+                (styleObj) => styleObj.id === prevParent.id
               );
             }
           );
@@ -141,19 +141,20 @@ const useDynamicStyle = (styleData: StyleData[]) => {
           prevParent.fileNames.length > styleObj.fileNames.length
         ) {
           clearStyles({
-            parent: styleObj.parent,
+            id: styleObj.id,
             fileNames: removedFileNames,
           });
-        } else if (removedFileNames.length > 0) {
+        }
+        if (removedFileNames.length > 0) {
           clearStyles({
-            parent: styleObj.parent,
+            id: styleObj.id,
             fileNames: removedFileNames,
           });
         }
       }
     });
 
-    prevStyleArrayRef.current = styleData;
+    prevStyleArrayRef.current = [...styleData];
   };
 };
 

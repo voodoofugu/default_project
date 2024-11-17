@@ -5,7 +5,7 @@ import Request from "../suppComponents/Request";
 export default React.memo(function Pokemon2(): React.ReactElement {
   return (
     <>
-      <StyleTag parent="hi" fileNames={["hi"]} />
+      <StyleTag fileNames={["hi"]} />
       <Request
         requestName="pokemon2_s"
         url="https://pokeapi.co/api/v2/pokemon/9"
