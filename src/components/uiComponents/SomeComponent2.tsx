@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useSelector, nexusDispatch } from "../../../nexus-state/src/nexus";
-import StyleTag from "../suppComponents/StyleTag";
+// import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent2(): React.ReactElement {
   const selectorValue = useSelector(
@@ -18,7 +18,7 @@ export default function SomeComponent2(): React.ReactElement {
     <>
       {/* <StyleTag fileNames={["outputTailwind"]} /> */}
       <div>
-        <button onClick={increment}> Increment</button>
+        <button onClick={increment}>Increment</button>
       </div>
 
       <p>useSelector value: {selectorValue}</p>
