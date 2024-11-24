@@ -1,10 +1,10 @@
 import React from "react";
 
-import { useSelector, nexusDispatch } from "../../../nexus-state/src/nexus";
+import { useNexusSelect, nexusDispatch } from "../../../nexus-state/src/nexus";
 // import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent2(): React.ReactElement {
-  const selectorValue = useSelector(
+  const selectorValue = useNexusSelect(
     (state) => state.value1 + state.value2
   ) as number;
 
@@ -21,7 +21,7 @@ export default function SomeComponent2(): React.ReactElement {
         <button onClick={increment}>Increment</button>
       </div>
 
-      <p>useSelector value: {selectorValue}</p>
+      <p>useNexusSelect value: {selectorValue}</p>
     </>
   );
 }
