@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useNexusSelect, nexusDispatch } from "../../../nexus-state/src/nexus";
+import { useNexusSelect, nexusUpdate } from "../../../nexus-state/src/nexus";
 // import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent2(): React.ReactElement {
@@ -9,8 +9,8 @@ export default function SomeComponent2(): React.ReactElement {
   ) as number;
 
   const increment = () => {
-    nexusDispatch({
-      type: "INCREMENT",
+    nexusUpdate({
+      value2: (prev) => prev + 1,
     });
   };
 
