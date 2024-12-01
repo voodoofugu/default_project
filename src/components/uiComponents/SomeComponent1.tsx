@@ -2,22 +2,25 @@ import React from "react";
 
 import {
   useNexus,
-  // nexusDispatch,
-  nexusUpdate,
+  nexusDispatch,
+  // nexusUpdate,
 } from "../../../nexus-state/src/nexus";
 // import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent1(): React.ReactElement {
   const value1 = useNexus("value1");
 
-  const handleChange1 = (e: any) => {
-    // nexusDispatch({
-    //   type: "UPDATE_INPUT1",
-    //   payload: e.target.value,
-    // });
-    nexusUpdate({
-      value1: e.target.value,
+  const handleChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    nexusDispatch({
+      type: "UPDATE_INPUT1",
+      payload: e.target.value,
     });
+    // nexusUpdate({
+    //   _NEXUS_: {
+    //     value1: e.target.value,
+    //     value3: e.target.value,
+    //   },
+    // });
   };
 
   return (

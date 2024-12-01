@@ -1,5 +1,5 @@
 import { nexusAction } from "../nexus-state/src/nexus";
-import STYLE_DATA, { StyleData } from "./actions/STYLE_DATA";
+import { StyleData } from "./actions/STYLE_DATA";
 
 interface PokemonState {
   data: unknown | null;
@@ -29,11 +29,11 @@ export const initialStates = {
   value2_l: false,
 };
 
-const UPDATE_INPUT1 = nexusAction("value1");
-const INCREMENT = nexusAction((state) => ({
-  ...state,
-  value2: state.value2 + 1,
-}));
+// const UPDATE_INPUT1 = nexusAction("value1");
+// const INCREMENT = nexusAction((state) => ({
+//   ...state,
+//   value2: state.value2 + 1,
+// }));
 
 // Действия
 export const actions = {
@@ -42,47 +42,60 @@ export const actions = {
     ...action.payload,
   })),
 
-  STYLE_DATA,
+  // REQUEST_DATA: nexusAction((state, action) => {
+  //   if (action.payload) {
+  //     const { requestName, data, requestLoaded } = action.payload;
 
-  REQUEST_DATA: nexusAction((state, action) => {
-    if (action.payload) {
-      const { requestName, data, requestLoaded } = action.payload;
+  //     // Проверяем, что state[requestName] — это объект
+  //     const currentState = state[requestName as keyof StatesT] || {};
+  //     const newRequestData: { data?: unknown; requestLoaded?: boolean } =
+  //       typeof currentState === "object" && currentState !== null
+  //         ? { ...currentState }
+  //         : {};
 
-      // Проверяем, что state[requestName] — это объект
-      const currentState = state[requestName as keyof StatesT] || {};
-      const newRequestData: { data?: unknown; requestLoaded?: boolean } =
-        typeof currentState === "object" && currentState !== null
-          ? { ...currentState }
-          : {};
+  //     if (data !== undefined) {
+  //       // update
+  //       newRequestData.data = data;
+  //       if (!("requestLoaded" in newRequestData)) {
+  //         newRequestData.requestLoaded = false;
+  //       }
+  //     }
+  //     if (requestLoaded !== undefined) {
+  //       // update requestLoaded
+  //       newRequestData.requestLoaded = requestLoaded;
+  //     } else {
+  //       // clear
+  //       delete state[requestName as keyof StatesT];
+  //       console.log("requestName", requestName);
+  //     }
 
-      if (data !== undefined) {
-        // update
-        newRequestData.data = data;
-        if (!("requestLoaded" in newRequestData)) {
-          newRequestData.requestLoaded = false;
-        }
-      }
-      if (requestLoaded !== undefined) {
-        // update requestLoaded
-        newRequestData.requestLoaded = requestLoaded;
-      } else {
-        // clear
-        delete state[requestName as keyof StatesT];
-        console.log("requestName", requestName);
-      }
+  //     return {
+  //       ...state,
+  //       [requestName]: newRequestData,
+  //     };
+  //   }
 
-      return {
-        ...state,
-        [requestName]: newRequestData,
-      };
-    }
-
-    return state;
-  }),
-
-  UPDATE_INPUT1,
+  //   return state;
+  // }),
 
   UPDATE_INPUT2: nexusAction("value2"),
 
-  INCREMENT,
+  INCREMENT: {
+    reducer: (state: StatesT, action: { payload: number }) => ({
+      ...state,
+      value2: state.value2 + action.payload,
+    }),
+  },
+
+  UPDATE_INPUT1: {
+    reducer: (state: StatesT, action: { payload: string }) => ({
+      ...state,
+      value1: action.payload,
+    }),
+  },
+  handlePopupOpen: {
+    action: (payload: string) => {
+      console.log("Popup Opened with payload:", payload);
+    },
+  },
 };

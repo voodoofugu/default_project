@@ -1,5 +1,5 @@
 import React from "react";
-import { useNexus, nexusDispatch } from "../../../nexus-state/src/nexus";
+import { useNexus } from "../../../nexus-state/src/nexus";
 
 import { StyleData } from "../../../nexus/actions/STYLE_DATA";
 
@@ -33,21 +33,21 @@ const StyleTag = ({ fileNames, children }: StyleTagProps) => {
   const memoizedFileNames = React.useMemo(() => fileNames, [fileNames]);
 
   React.useEffect(() => {
-    nexusDispatch({
-      type: "STYLE_DATA",
-      payload: {
-        id: id,
-        fileNames: memoizedFileNames,
-      },
-    });
+    // nexusDispatch({
+    //   type: "STYLE_DATA",
+    //   payload: {
+    //     id: id,
+    //     fileNames: memoizedFileNames,
+    //   },
+    // });
 
     return () => {
-      nexusDispatch({
-        type: "STYLE_DATA",
-        payload: {
-          id: id,
-        },
-      });
+      // nexusDispatch({
+      //   type: "STYLE_DATA",
+      //   payload: {
+      //     id: id,
+      //   },
+      // });
     };
   }, [memoizedFileNames]);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { nexusDispatch } from "../../../nexus-state/src/nexus";
+// import { nexusDispatch } from "../../../nexus-state/src/nexus";
 
 import textToCamelcase from "../../scripts/textToCamelcase";
 import { StyleData } from "../../../nexus/actions/STYLE_DATA";
@@ -82,13 +82,13 @@ const useDynamicStyle = (styleData: StyleData[]) => {
       totalFiles === 0 ||
       (loadedFilesRef.current.loadedFiles === totalFiles && !stylesLoaded)
     ) {
-      nexusDispatch({
-        type: "STYLE_DATA",
-        payload: {
-          id: id,
-          stylesLoaded: true,
-        },
-      });
+      // nexusDispatch({
+      //   type: "STYLE_DATA",
+      //   payload: {
+      //     id: id,
+      //     stylesLoaded: true,
+      //   },
+      // });
     }
   };
 

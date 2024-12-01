@@ -1,6 +1,10 @@
 import React from "react";
 
-import { useNexusSelect, nexusUpdate } from "../../../nexus-state/src/nexus";
+import {
+  useNexusSelect,
+  nexusUpdate,
+  nexusDispatch,
+} from "../../../nexus-state/src/nexus";
 // import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent2(): React.ReactElement {
@@ -10,8 +14,20 @@ export default function SomeComponent2(): React.ReactElement {
 
   const increment = () => {
     nexusUpdate({
-      value2: (prev) => prev + 1,
+      value2: 4,
     });
+    // nexusDispatch({
+    //   type: "handlePopupOpen",
+    //   payload: "Hello!",
+    // });
+    // nexusDispatch({
+    //   type: "handlePopupOpen",
+    //   payload: "Hello!",
+    // });
+    // nexusDispatch({
+    //   type: "UPDATE_INPUT2",
+    //   payload: 4,
+    // });
   };
 
   return (
