@@ -14,7 +14,7 @@ export default function SomeComponent2(): React.ReactElement {
 
   const increment = () => {
     nexusUpdate({
-      value2: 4,
+      value2: (prev) => prev + 1,
     });
     // nexusDispatch({
     //   type: "handlePopupOpen",
