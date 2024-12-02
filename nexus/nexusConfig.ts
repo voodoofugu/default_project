@@ -1,4 +1,3 @@
-import { nexusAction } from "../nexus-state/src/nexus";
 import { StyleData } from "./actions/STYLE_DATA";
 
 interface PokemonState {
@@ -16,6 +15,9 @@ declare global {
 
 // Начальное состояние
 export const initialStates = {
+  searchText: "",
+  searchData: [] as string[],
+
   value1: "",
   value2: 0,
   value3: "",
@@ -37,10 +39,10 @@ export const initialStates = {
 
 // Действия
 export const actions = {
-  SOME_ACTION2: nexusAction((state, action) => ({
-    ...state,
-    ...action.payload,
-  })),
+  // SOME_ACTION2: nexusAction((state, action) => ({
+  //   ...state,
+  //   ...action.payload,
+  // })),
 
   // REQUEST_DATA: nexusAction((state, action) => {
   //   if (action.payload) {
@@ -78,7 +80,7 @@ export const actions = {
   //   return state;
   // }),
 
-  UPDATE_INPUT2: nexusAction("value2"),
+  // UPDATE_INPUT2: nexusAction("value2"),
 
   INCREMENT: {
     reducer: (state: StatesT, action: { payload: number }) => ({
@@ -93,6 +95,7 @@ export const actions = {
       value1: action.payload,
     }),
   },
+
   handlePopupOpen: {
     action: (payload: string) => {
       console.log("Popup Opened with payload:", payload);
