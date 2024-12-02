@@ -8,9 +8,7 @@ import {
 // import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent2(): React.ReactElement {
-  const selectorValue = useNexusSelect(
-    (state) => state.value1 + state.value2
-  ) as number;
+  const selectorValue = useNexusSelect((state) => state.value2 + 0) as number;
 
   const increment = () => {
     // nexusUpdate({
@@ -20,14 +18,6 @@ export default function SomeComponent2(): React.ReactElement {
       type: "handlePopupOpen",
       payload: "Hello!",
     });
-    // nexusDispatch({
-    //   type: "handlePopupOpen",
-    //   payload: "Hello!",
-    // });
-    // nexusDispatch({
-    //   type: "UPDATE_INPUT2",
-    //   payload: 4,
-    // });
   };
 
   return (
