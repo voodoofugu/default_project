@@ -6,11 +6,11 @@ interface PokemonState {
 }
 
 type InitialStatesT = typeof initialStates;
-type InitialActionsT = typeof actions;
+type InitialFuncsT = typeof initialFuncs;
 
 declare global {
   interface StatesT extends InitialStatesT {}
-  interface ActionsT extends InitialActionsT {}
+  interface FuncsT extends InitialFuncsT {}
 }
 
 // Начальное состояние
@@ -38,7 +38,7 @@ export const initialStates = {
 // }));
 
 // Действия
-export const actions = {
+export const initialFuncs = {
   // SOME_ACTION2: nexusAction((state, action) => ({
   //   ...state,
   //   ...action.payload,
@@ -82,22 +82,22 @@ export const actions = {
 
   // UPDATE_INPUT2: nexusAction("value2"),
 
-  INCREMENT: {
-    reducer: (state: StatesT, action: { payload: number }) => ({
-      ...state,
-      value2: state.value2 + action.payload,
-    }),
-  },
+  // INCREMENT: {
+  //   reducer: (state: StatesT, action: { payload: number }) => ({
+  //     ...state,
+  //     value2: state.value2 + action.payload,
+  //   }),
+  // },
 
-  UPDATE_INPUT1: {
-    reducer: (state: StatesT, action: { payload: string }) => ({
-      ...state,
-      value1: action.payload,
-    }),
-  },
+  // UPDATE_INPUT1: {
+  //   reducer: (state: StatesT, action: { payload: string }) => ({
+  //     ...state,
+  //     value1: action.payload,
+  //   }),
+  // },
 
   handlePopupOpen: {
-    action: (payload: string) => {
+    fData: (payload: string) => {
       console.log("Popup Opened with payload:", payload);
     },
   },

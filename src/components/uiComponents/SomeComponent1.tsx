@@ -14,7 +14,6 @@ export default function SomeComponent1(): React.ReactElement {
   const searchText = useNexus("searchText");
 
   const [focus, setFocus] = useState(false);
-  const [searchData2, setSearchData2] = useState([] as string[]);
   // console.log("searchData2", searchData2);
 
   const clearBtnRef = useRef<HTMLInputElement | null>(null);
@@ -54,7 +53,9 @@ export default function SomeComponent1(): React.ReactElement {
           (value, index) => value === prevFilteredValueRef.current[index]
         )
       ) {
-        setSearchData2(filteredData);
+        nexusUpdate({
+          searchData: filteredData,
+        });
         prevFilteredValueRef.current = filteredData;
       }
     },
@@ -90,11 +91,6 @@ export default function SomeComponent1(): React.ReactElement {
   };
 
   // effects
-  useEffect(() => {
-    nexusUpdate({
-      searchData: searchData2,
-    });
-  }, [searchData2]);
 
   useEffect(() => {
     prevSearchTextRef.current = searchText;

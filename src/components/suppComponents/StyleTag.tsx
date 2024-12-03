@@ -33,7 +33,7 @@ const StyleTag = ({ fileNames, children }: StyleTagProps) => {
   const memoizedFileNames = React.useMemo(() => fileNames, [fileNames]);
 
   React.useEffect(() => {
-    // nexusDispatch({
+    // nexusEffect({
     //   type: "STYLE_DATA",
     //   payload: {
     //     id: id,
@@ -42,7 +42,7 @@ const StyleTag = ({ fileNames, children }: StyleTagProps) => {
     // });
 
     return () => {
-      // nexusDispatch({
+      // nexusEffect({
       //   type: "STYLE_DATA",
       //   payload: {
       //     id: id,
