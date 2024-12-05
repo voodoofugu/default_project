@@ -5,9 +5,15 @@ interface PokemonState {
   requestLoaded: boolean;
 }
 
+type NotificationProps = {
+  view?: boolean;
+  className?: string;
+  img?: string;
+  text?: string;
+};
+
 type InitialStatesT = typeof initialStates;
 type InitialFuncsT = typeof initialFuncs;
-
 declare global {
   interface StatesT extends InitialStatesT {}
   interface FuncsT extends InitialFuncsT {}
@@ -29,6 +35,8 @@ export const initialStates = {
   pokemon1_s: { data: null, requestLoaded: false } as PokemonState,
   pokemon2_s: { data: null, requestLoaded: false } as PokemonState,
   value2_l: false,
+
+  notif: null as NotificationProps | null,
 };
 
 // const UPDATE_INPUT1 = nexusAction("value1");
