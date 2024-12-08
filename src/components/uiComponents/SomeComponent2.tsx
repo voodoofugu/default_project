@@ -1,27 +1,28 @@
 import React, { useEffect } from "react";
 
 import {
-  useNexus,
-  // useNexusSelect,
+  // useNexus,
+  useNexusSelect,
   nexusUpdate,
-  // nexusEffect,
+  // nexusTrigger,
 } from "../../../nexus-state/src/nexus";
 // import StyleTag from "../suppComponents/StyleTag";
 
 import Notification from "./Notification";
 
 export default function SomeComponent2(): React.ReactElement {
-  const value2 = useNexus("value2");
+  // const value2 = useNexus("value2");
+  const select = useNexusSelect((state) => state.value3 + state.value2);
 
   useEffect(() => {
     nexusUpdate({
       notif: {
         view: true,
         img: "https://img.icons8.com/ios-glyphs/30/000000/like.png",
-        text: `You got ${value2} points!`,
+        // text: `You got ${select} points!`,
       },
     });
-  }, [value2]);
+  }, [select]);
 
   const increment = () => {
     nexusUpdate({
@@ -35,7 +36,7 @@ export default function SomeComponent2(): React.ReactElement {
         <button onClick={increment}>Increment</button>
       </div>
 
-      <p>useNexusSelect value: {value2}</p>
+      <p>useNexusSelect value: {`${select}`}</p>
 
       <Notification />
     </>
