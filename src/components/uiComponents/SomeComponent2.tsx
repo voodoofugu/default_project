@@ -6,7 +6,7 @@ import {
   nexusUpdate,
   // nexusTrigger,
 } from "../../../nexus-state/src/nexus";
-// import StyleTag from "../suppComponents/StyleTag";
+import StyleTag from "../suppComponents/StyleTag";
 
 import Notification from "./Notification";
 
@@ -32,6 +32,7 @@ export default function SomeComponent2(): React.ReactElement {
 
   return (
     <>
+      <StyleTag fileNames={["outputTailwind"]} />
       <div>
         <button onClick={increment}>Increment</button>
       </div>

@@ -1,55 +1,62 @@
 import React from "react";
-import { useNexus } from "../../../nexus-state/src/nexus";
-
-import { StyleData } from "../../../nexus/actions/STYLE_DATA";
+import { useNexus, nexusUpdate } from "../../../nexus-state/src/nexus";
 
 interface StyleTagProps {
-  fileNames: StyleData["fileNames"];
+  fileNames: string[];
   loadingElement?: React.ReactNode;
   children?: React.ReactNode;
 }
+
+type StyleData = Record<
+  string,
+  {
+    fileNames?: string[];
+    totalFiles?: number;
+    stylesLoaded?: boolean;
+  }
+>;
 
 const styleLoading = ({
   id,
   styleData,
 }: {
   id: string;
-  styleData: StyleData[];
+  styleData: StyleData | null;
 }) => {
   let stylesLoaded = false;
-  styleData.forEach((styleObj) => {
-    if (styleObj.id === id) {
+  if (styleData) {
+    const styleObj = styleData[id];
+    if (styleObj) {
       stylesLoaded = styleObj.stylesLoaded ?? false;
     }
-  });
-
-  return stylesLoaded ? true : false;
+  }
+  return stylesLoaded;
 };
 
 const StyleTag = ({ fileNames, children }: StyleTagProps) => {
   const id = React.useId();
   const styleData = useNexus("styleData");
 
-  const memoizedFileNames = React.useMemo(() => fileNames, [fileNames]);
-
   React.useEffect(() => {
-    // nexusTrigger({
-    //   type: "STYLE_DATA",
-    //   payload: {
-    //     id: id,
-    //     fileNames: memoizedFileNames,
-    //   },
-    // });
+    nexusUpdate({
+      styleData: (state) => {
+        if (state === null) {
+          return { [id]: { fileNames } };
+        }
+        return { ...state, [id]: { fileNames } };
+      },
+    });
 
     return () => {
-      // nexusTrigger({
-      //   type: "STYLE_DATA",
-      //   payload: {
-      //     id: id,
-      //   },
-      // });
+      nexusUpdate({
+        styleData: (state) => {
+          if (state === null) return null;
+          const { [id]: _, ...rest } = state;
+          return rest;
+        },
+      });
     };
-  }, [memoizedFileNames]);
+  }, [fileNames, id]);
 
   const stylesLoaded = styleLoading({ id, styleData });
 

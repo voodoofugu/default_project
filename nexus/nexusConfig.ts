@@ -1,9 +1,15 @@
-import { StyleData } from "./actions/STYLE_DATA";
-
 interface PokemonState {
   data: unknown | null;
   requestLoaded: boolean;
 }
+type StyleData = Record<
+  string,
+  {
+    fileNames?: string[];
+    totalFiles?: number;
+    stylesLoaded?: boolean;
+  }
+>;
 
 type NotificationProps = {
   view?: boolean;
@@ -31,7 +37,7 @@ export const initialStates = {
     a: 1,
     b: "hi",
   } as { a: number; b: string },
-  styleData: [] as StyleData[],
+  styleData: null as StyleData | null,
   pokemon1_s: { data: null, requestLoaded: false } as PokemonState,
   pokemon2_s: { data: null, requestLoaded: false } as PokemonState,
   value2_l: false,

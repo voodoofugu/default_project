@@ -2,7 +2,7 @@
 
 export interface StyleData {
   id: string;
-  fileNames: string[];
+  fileNames?: string[];
   totalFiles?: number;
   stylesLoaded?: boolean;
 }

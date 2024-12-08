@@ -5,7 +5,7 @@ import {
   // nexusDispatch,
   nexusUpdate,
 } from "../../../nexus-state/src/nexus";
-// import StyleTag from "../suppComponents/StyleTag";
+import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent1(): React.ReactElement {
   const value1 = useNexus("value1");
@@ -22,7 +22,7 @@ export default function SomeComponent1(): React.ReactElement {
 
   return (
     <>
-      {/* <StyleTag fileNames={["hi"]} /> */}
+      <StyleTag fileNames={["hi"]} />
       <div>
         <input type="text" value={value1 || ""} onChange={handleChange1} />
         <p>Current input value: {value1}</p>
