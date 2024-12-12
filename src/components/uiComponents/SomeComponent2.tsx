@@ -32,12 +32,13 @@ export default function SomeComponent2(): React.ReactElement {
 
   return (
     <>
-      <StyleTag fileNames={["outputTailwind"]} />
-      <div>
-        <button onClick={increment}>Increment</button>
-      </div>
+      <StyleTag fileNames={["outputTailwind"]}>
+        <div>
+          <button onClick={increment}>Increment</button>
+        </div>
 
-      <p>useNexusSelect value: {`${select}`}</p>
+        <p>useNexusSelect value: {`${select}`}</p>
+      </StyleTag>
 
       <Notification />
     </>

@@ -39,12 +39,13 @@ const StyleTag = ({ fileNames, children }: StyleTagProps) => {
 
   React.useEffect(() => {
     nexusUpdate({
-      styleData: (state) => {
-        if (state === null) {
-          return { [id]: { fileNames } };
-        }
-        return { ...state, [id]: { fileNames } };
-      },
+      styleData: (state) => ({
+        ...state,
+        [id]: {
+          ...state?.[id],
+          fileNames,
+        },
+      }),
     });
 
     return () => {
