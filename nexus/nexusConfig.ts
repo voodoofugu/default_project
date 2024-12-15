@@ -6,7 +6,6 @@ type StyleData = Record<
   string,
   {
     fileNames?: string[];
-    totalFiles?: number;
     stylesLoaded?: boolean;
   }
 >;
@@ -27,6 +26,9 @@ declare global {
 
 // Начальное состояние
 export const initialStates = {
+  styleData: null as StyleData | null,
+  DSisUsed: false,
+
   searchText: "",
   searchData: [] as string[],
 
@@ -37,7 +39,6 @@ export const initialStates = {
     a: 1,
     b: "hi",
   } as { a: number; b: string },
-  styleData: null as StyleData | null,
   pokemon1_s: { data: null, requestLoaded: false } as PokemonState,
   pokemon2_s: { data: null, requestLoaded: false } as PokemonState,
   value2_l: false,

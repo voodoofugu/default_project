@@ -1,12 +1,14 @@
 import React from "react";
-import { useNexus } from "../../../nexus-state/src/nexus";
 
 import useDynamicStyle from "../hooks/useDynamicStyle";
 
 const StyleTagCore: React.FC = () => {
-  const styleData = useNexus("styleData");
+  const importStyle = async ({ fileName }: { fileName: string }) => {
+    const { default: data } = await import(`../../style/css/${fileName}.css`);
+    return data;
+  };
 
-  useDynamicStyle(styleData);
+  useDynamicStyle(importStyle);
 
   return null;
 };
