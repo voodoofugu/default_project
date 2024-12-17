@@ -9,21 +9,13 @@ import {
 
 import Notification from "./Notification";
 
-import { subscribe } from "../stateManager/globalStore";
+// import useStore from "../stateManager/useStore";
 
 export default function SomeComponent2(): React.ReactElement {
   // const select = useNexus("value2");
   const select = useNexusSelect((state) => state.value3 + state.value2);
 
-  const [count, setCount] = React.useState<number | undefined>(undefined); // Изначально undefined
-  useEffect(() => {
-    const unsubscribe = subscribe<number>("count", (newCount) => {
-      setCount(newCount); // Обновляем state count при изменении
-    });
-
-    // Очистка подписки при размонтировании компонента
-    return () => unsubscribe();
-  }, []);
+  // const [state, setState] = useStore({ name: "John" });
 
   useEffect(() => {
     nexusUpdate({
@@ -48,7 +40,7 @@ export default function SomeComponent2(): React.ReactElement {
       </div>
 
       <p>useNexusSelect value: {`${select}`}</p>
-      <p>proxuCount value: {`${count}`}</p>
+      {/* <p>proxuCount value: {`${state.name}`}</p> */}
 
       <Notification />
     </>
