@@ -10,7 +10,11 @@ import Storage from "./suppComponents/Storage";
 
 import StyleTagCore from "./suppComponents/StyleTagCore";
 
+import { initializeState } from "./stateManager/globalStore";
+
 export default function App(): React.ReactElement {
+  initializeState({ count: 0 });
+
   return (
     <NexusProvider initialStates={initialStates} initialFuncs={initialFuncs}>
       <Storage watch />
