@@ -9,12 +9,7 @@ import {
 
 import Notification from "./Notification";
 
-import {
-  initializeState,
-  getState,
-  setState,
-  subscribe,
-} from "../../scripts/globalStore";
+import { subscribe } from "../stateManager/globalStore";
 
 export default function SomeComponent2(): React.ReactElement {
   // const select = useNexus("value2");

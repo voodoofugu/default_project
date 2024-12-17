@@ -1,11 +1,11 @@
 // SomeComponent3.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import {
   getState,
   setState,
   subscribe,
   initializeState,
-} from "../../scripts/globalStore";
+} from "../stateManager/globalStore";
 
 // Пример компонента, который подписывается на обновления состояния
 export default function SomeComponent3(): React.ReactElement {
@@ -14,7 +14,7 @@ export default function SomeComponent3(): React.ReactElement {
     initializeState({ count: 0 });
   }, []);
 
-  const countRef = useRef(getState().count); // Храним текущее значение в ref
+  let countRef = getState().count; // Храним текущее значение в ref
 
   // Обработчик для обновления состояния
   const increment = () => {
@@ -28,7 +28,7 @@ export default function SomeComponent3(): React.ReactElement {
   // Подписка на обновление состояния без использования useState
   useEffect(() => {
     const unsubscribe = subscribe<number>("count", (newCount) => {
-      countRef.current = newCount;
+      countRef = newCount;
       forceUpdate(); // Принудительная перерисовка компонента
     });
 
@@ -40,7 +40,7 @@ export default function SomeComponent3(): React.ReactElement {
 
   return (
     <div>
-      <h1>Current Count: {countRef.current}</h1>
+      <h1>Current Count: {countRef}</h1>
       <button onClick={increment}>Increment</button>
       <button onClick={decrement}>Decrement</button>
     </div>
