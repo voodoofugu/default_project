@@ -12,9 +12,15 @@ import StyleTagCore from "./suppComponents/StyleTagCore";
 
 import { initializeState } from "./stateManager/globalStore";
 
-export default function App(): React.ReactElement {
-  initializeState({ count: 0 });
+// state
+const initialState = { count: 0, count2: 0, boolean: true, name: "John" };
+type InitialStatesT = typeof initialState;
+declare global {
+  interface IStatesT extends InitialStatesT {}
+}
+initializeState(initialState);
 
+export default function App(): React.ReactElement {
   return (
     <NexusProvider initialStates={initialStates} initialFuncs={initialFuncs}>
       <Storage watch />

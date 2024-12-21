@@ -10,7 +10,7 @@ type StyleData = Record<
   }
 >;
 
-type ImportStyleT = ({ fileName }: { fileName: string }) => Promise<string>;
+type ImportStyleT = (fileName: string) => Promise<{ default: string }>;
 
 const arraysEqual = (arr1: string[], arr2: string[]) =>
   arr1.length === arr2.length && arr1.every((v, i) => v === arr2[i]);
@@ -72,7 +72,7 @@ const loadStyles = async (
   for (const fileName of fileNames) {
     const styleElement = createStateTag(id, fileName);
     try {
-      const cssData = await importStyle({ fileName: fileName });
+      const { default: cssData } = await importStyle(fileName);
       styleElement.textContent = cssData;
     } catch (error) {
       console.error(`🚫 Error loading style for ${fileName}:`, error);
