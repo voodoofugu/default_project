@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNexus, nexusUpdate } from "../../../nexus-state/src/nexus";
-import StyleTag from "../../../styled-flex/src/StyleTag";
+import StyleTag from "../../../styled-atom/src/StyleTag";
 
 export default function SomeComponent1(): React.ReactElement {
   const value1 = useNexus("value1");

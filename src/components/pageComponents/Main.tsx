@@ -1,6 +1,6 @@
 import React from "react";
 
-import StyleTag from "../../../styled-flex/src/StyleTag";
+import StyleTag from "../../../styled-atom/src/StyleTag";
 
 import StateViewer from "../uiComponents/StateViewer";
 

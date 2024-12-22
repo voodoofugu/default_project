@@ -8,7 +8,7 @@ import { initialStates, initialFuncs } from "../../nexus/nexusConfig";
 import Main from "./pageComponents/Main";
 import Storage from "./suppComponents/Storage";
 
-import StyleCore from "../../styled-flex/src/StyleCore";
+import StyleCore from "../../styled-atom/src/StyleCore";
 
 import { initializeState } from "./stateManager/globalStore";
 
