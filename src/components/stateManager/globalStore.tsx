@@ -19,14 +19,17 @@ const initializeState = (initialState: Partial<IStatesT>) => {
   proxyState = new Proxy(state, {
     get(target, key: string | symbol) {
       if (typeof key === "string" && key in target) {
-        return target[key as keyof IStatesT]; // Уточняем тип key
+        return target[key as keyof IStatesT];
       }
       return undefined;
     },
     set(target, key: string | symbol, value: any) {
-      if (typeof key === "string" && key in target) {
+      if (typeof key === "string") {
         const currentValue = target[key as keyof IStatesT];
         if (JSON.stringify(currentValue) !== JSON.stringify(value)) {
+          target[key as keyof IStatesT] = value; // Обновляем состояние
+
+          // Уведомляем подписчиков
           const keyListeners = listeners.get(key);
           if (keyListeners) {
             keyListeners.forEach((listener) => listener(value));
@@ -56,6 +59,31 @@ const getState = (): IStatesT => {
   return { ...proxyState };
 };
 
+const getAllStateValues = (): IStatesT => {
+  if (!proxyState) {
+    console.warn("State is not initialized yet.");
+    return {} as IStatesT;
+  }
+
+  return { ...proxyState };
+};
+
+const subscribeToAll = (listener: Listener<IStatesT>): (() => void) => {
+  const unsubscribeFunctions: (() => void)[] = [];
+
+  for (const key in state) {
+    unsubscribeFunctions.push(
+      subscribe(key, () => {
+        listener({ ...proxyState } as IStatesT); // Возвращаем копию всего состояния
+      })
+    );
+  }
+
+  return () => {
+    unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
+  };
+};
+
 const setState = <K extends keyof IStatesT>(
   key: K,
   value: IStatesT[K]
@@ -67,4 +95,11 @@ const setState = <K extends keyof IStatesT>(
   proxyState[key] = value;
 };
 
-export { initializeState, getState, setState, subscribe };
+export {
+  initializeState,
+  getState,
+  getAllStateValues,
+  subscribeToAll,
+  setState,
+  subscribe,
+};

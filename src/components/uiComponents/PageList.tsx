@@ -8,7 +8,6 @@ import React, {
 } from "react";
 
 import { useNexus, nexusUpdate } from "../../../nexus-state/src/nexus";
-// import StyleTag from "../suppComponents/StyleTag";
 
 export default function SomeComponent1(): React.ReactElement {
   const searchText = useNexus("searchText");

@@ -8,12 +8,14 @@ import { initialStates, initialFuncs } from "../../nexus/nexusConfig";
 import Main from "./pageComponents/Main";
 import Storage from "./suppComponents/Storage";
 
-import StyleTagCore from "./suppComponents/StyleTagCore";
+import StyleCore from "../../styled-flex/src/StyleCore";
 
 import { initializeState } from "./stateManager/globalStore";
 
 // state
-const initialState = { count: 0, count2: 0, boolean: true, name: "John" };
+const initialState = {
+  count: 0,
+};
 type InitialStatesT = typeof initialState;
 declare global {
   interface IStatesT extends InitialStatesT {}
@@ -24,7 +26,10 @@ export default function App(): React.ReactElement {
   return (
     <NexusProvider initialStates={initialStates} initialFuncs={initialFuncs}>
       <Storage watch />
-      <StyleTagCore />
+      <StyleCore
+        watch
+        path={(name: string) => import(`../../src/style/css/${name}.css`)}
+      />
       <Main />
     </NexusProvider>
   );

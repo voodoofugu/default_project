@@ -1,45 +1,43 @@
 import React from "react";
 import { getState, setState, subscribe } from "./globalStore";
-import deepCompare from "./deepCompare";
 
 const useStore = <K extends keyof IStatesT>(
-  state: K
+  stateKey: K
 ): [
   IStatesT[K],
   (update: ((prevState: IStatesT[K]) => IStatesT[K]) | IStatesT[K]) => void
 ] => {
-  // Получаем конкретное значение по ключу из глобального стора
-  const stateRef = React.useRef<IStatesT[K]>(getState()[state]);
+  // Селектор для получения значения по ключу
+  const getSnapshot = () => getState()[stateKey];
 
-  const forceUpdate = React.useReducer(() => ({}), {})[1];
+  // Подписка на изменения
+  const subscribeToStore = (callback: () => void) =>
+    subscribe(stateKey, callback);
 
-  // Подписываемся на изменения конкретного состояния
-  React.useEffect(() => {
-    const unsubscribe = subscribe<IStatesT[K]>(state, (newValue) => {
-      if (!deepCompare(stateRef.current, newValue)) {
-        stateRef.current = newValue;
-        forceUpdate();
-      }
-    });
-
-    return () => unsubscribe();
-  }, [state]);
-
-  // Обновляем конкретное состояние через setState
-  const updateGlobalState = React.useCallback(
-    (update: ((prevState: IStatesT[K]) => IStatesT[K]) | IStatesT[K]) => {
-      const newState =
-        typeof update === "function"
-          ? (update as (prevState: IStatesT[K]) => IStatesT[K])(
-              stateRef.current
-            )
-          : update;
-      setState(state, newState);
-    },
-    [state]
+  const state = React.useSyncExternalStore(
+    subscribeToStore,
+    getSnapshot,
+    getSnapshot // В SSR возвращаем текущее состояние
   );
 
-  return [stateRef.current, updateGlobalState];
+  // Функция для обновления состояния
+  const updateGlobalState = React.useCallback(
+    (update: ((prevState: IStatesT[K]) => IStatesT[K]) | IStatesT[K]) => {
+      const currentState = getSnapshot();
+      const newState =
+        typeof update === "function"
+          ? (update as (prevState: IStatesT[K]) => IStatesT[K])(currentState)
+          : update;
+
+      // Устанавливаем новое состояние только при изменении
+      if (!Object.is(currentState, newState)) {
+        setState(stateKey, newState);
+      }
+    },
+    [stateKey]
+  );
+
+  return [state, updateGlobalState];
 };
 
 export default useStore;
