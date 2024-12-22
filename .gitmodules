@@ -1,3 +1,6 @@
 [submodule "nexus-state"]
 	path = nexus-state
 	url = https://github.com/voodoofugu/nexus-state.git
+[submodule "styled-atom"]
+	path = styled-atom
+	url = https://github.com/voodoofugu/styled-atom.git
