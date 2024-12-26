@@ -1,6 +1,6 @@
 import React from "react";
 
-import StyleTag from "../../../styled-atom/src/StyleTag";
+import StyledAtom from "../../../styled-atom/src/StyledAtom";
 
 import StateViewer from "../uiComponents/StateViewer";
 
@@ -14,9 +14,12 @@ export default function Main(): React.ReactElement {
       <StateViewer />
 
       <SomeComponent1 />
-      <StyleTag fileNames={["outputTailwind"]}>
+      <StyledAtom
+        fileNames={["outputTailwind"]}
+        fallback={<div>Loading...</div>}
+      >
         <SomeComponent2 />
-      </StyleTag>
+      </StyledAtom>
       <SomeComponent3 />
     </>
   );
