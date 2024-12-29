@@ -17,6 +17,7 @@ export default function Main(): React.ReactElement {
       <StyledAtom
         fileNames={["outputTailwind"]}
         fallback={<div>Loading...</div>}
+        encap
       >
         <SomeComponent2 />
       </StyledAtom>
