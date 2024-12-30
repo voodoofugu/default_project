@@ -12,10 +12,11 @@ export default function Main(): React.ReactElement {
   return (
     <>
       <StateViewer />
+      <StyledAtom fileNames={["outputTailwind"]} />
 
       <SomeComponent1 />
       <StyledAtom
-        fileNames={["outputTailwind"]}
+        fileNames={["some-style", "main-style"]}
         fallback={<div>Loading...</div>}
         encap
       >
