@@ -16,9 +16,9 @@ export default function Main(): React.ReactElement {
 
       <SomeComponent1 />
       <StyledAtom
-        fileNames={["some-style", "main-style"]}
+        fileNames={["some-style", "main-style", "a"]}
         fallback={<div>Loading...</div>}
-        encap
+        encap="mainStyle"
       >
         <SomeComponent2 />
       </StyledAtom>

@@ -20,7 +20,6 @@ export default function SomeComponent1(): React.ReactElement {
   return (
     <>
       {/* <StyledAtom fileNames={["main-style"]} onLoad={handleStylesLoaded} /> */}
-      <StyledAtom fileNames={[]} onLoad={handleStylesLoaded} />
       <p>Styles loaded: {isLoaded ? "Yes" : "No"}</p>
       <div>
         <input type="text" value={value1 || ""} onChange={handleChange1} />

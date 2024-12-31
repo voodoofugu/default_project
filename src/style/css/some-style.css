@@ -4,3 +4,6 @@ div {
   width: min-content;
   padding: 2px 8px;
 }
+p {
+  background: #ffc400;
+}
